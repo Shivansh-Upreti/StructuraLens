@@ -1,6 +1,6 @@
 # StructuraLens 🚀
 
-> **Live Production URL:** [https://recursio.netlify.app](https://recursio.netlify.app)
+> **Live Production URL:** [https://structuralens.netlify.app](https://structuralens.netlify.app)
 
 **StructuraLens** is a client-side DS & DAA visual learning platform for computer science students. It makes the concepts that are hardest to picture (recursion, sorting, searching, two pointers, backtracking, greedy, dynamic programming and graph traversals) visible, step by step, with code and animation moving in lock-step. It grew out of the original *Recursio* recursion visualizer, which lives on unchanged as the **Recursion** topic.
 
@@ -52,18 +52,3 @@ npm run dev
 npm run build
 
 ---
-
-## 🧭 Curriculum
-| Tier | Topics | Status |
-|---|---|---|
-| 1 · Data Structures | Complexity Analysis (growth curves, Big-O/Ω/Θ), Sorting (bubble, insertion, merge, quick), Searching (linear, binary), **Recursion** (the original, untouched module), Tree Traversals (in/pre/post-order, level-order), Graph Traversals (BFS, DFS with visited set), Two Pointers | Interactive |
-| 2 · Core paradigms | Backtracking (N-Queens), Greedy (interval scheduling), Dynamic Programming (0/1 knapsack, LCS, coin change) | Interactive |
-| 3 · Advanced DAA | Advanced D&C (**Strassen** animated; FFT, closest pair previews); Dynamic Programming (**0/1 Knapsack**, **MCM**, LCS, coin change animated; bitmask, tree DP previews); Advanced Graphs (**Dijkstra** and **A\*** animated; Tarjan SCC, Johnson, Ford-Fulkerson, AO\* previews); String & Geometric (**KMP** animated; Rabin-Karp, convex hull previews) | Flagships interactive; the rest are annotated previews (click a line of pseudo-code to see what it does) |
-
-**Adaptive Explanation Engine:** every topic except Recursion has a Beginner / Intermediate-Advanced toggle (remembered across visits) that swaps analogy and step-by-step text for complexity, proof sketches and trade-offs, plus a per-step hint. Content lives in `src/platform/explanations*.js`.
-
-**Split-screen workspace:** every topic except Recursion uses a no-scroll layout (`height: calc(100vh - navbar)`): code / My code / Explain on the left, the visualizer on the right, playback controls pinned below. Verified at 1366×768 and 1280×720: the page itself never scrolls.
-
-**My code (all topics except Recursion):** write your own implementation next to the algorithm. It runs in an isolated Web Worker (`src/platform/code/usercode.worker.js`, 3 s hard timeout) against a contract of tests per algorithm (`contracts.js`; judged by trusted reference code on the main thread). Turn on **Suggestion & Correction Mode** (default off) to also get pattern-based logic checks (`rules.js`): *incorrect logic* (e.g. missing backtrack step), *minor mistakes* with an **Accept suggestion** button that rewrites the offending line, and *optimization* hints (including a timing probe). These checks are heuristics: the tests decide correctness. Algorithms without a contract get a plain scratchpad.
-
-Routing is hash based (`#/sorting`), so the static site needs no redirect rules. New algorithms plug into `src/platform/algorithms/*` (a `run(params)` that records frames with `F.add(line, note, kind, vizState)`), plus a viz component in `src/platform/viz/`.

@@ -15,7 +15,7 @@ export default function GraphViz({ frame }) {
   const at = Object.fromEntries(graph.nodes.map((n) => [n.id, n]));
   return (
     <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_200px]">
-      <svg viewBox="0 0 100 100" style={{ maxHeight: 'var(--viz-h, 460px)' }} className="mx-auto w-full rounded-xl bg-slate-100/60 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800" role="img" aria-label="Graph">
+      <svg viewBox="0 0 100 100" style={{ maxHeight: 'var(--viz-h, 460px)' }} className="mx-auto w-full rounded-md bg-slate-100/60 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800" role="img" aria-label="Graph">
         {graph.edges.map((e, i) => {
           const a = at[e[0]], b = at[e[1]], tree = treeEdges.some((t) => same(e, t)), pr = same(e, probe);
           return (
@@ -36,9 +36,9 @@ export default function GraphViz({ frame }) {
       <div className="flex flex-col gap-3">
         <div>
           <p className="eyebrow mb-1.5">{struct.name}</p>
-          <div className="flex min-h-[44px] flex-wrap gap-1.5 rounded-xl bg-slate-100/60 p-2 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
+          <div className="flex min-h-[44px] flex-wrap gap-1.5 rounded-md bg-slate-100/60 p-2 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
             <AnimatePresence initial={false}>
-              {struct.items.map((id, i) => <motion.span layout key={id + '-' + i} initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} className="flex h-8 min-w-8 items-center justify-center rounded-lg bg-amber-100 px-1.5 text-sm font-bold text-amber-900 dark:bg-amber-900/50 dark:text-amber-100">{id}</motion.span>)}
+              {struct.items.map((id, i) => <motion.span layout key={id + '-' + i} initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} className="flex h-8 min-w-8 items-center justify-center rounded-md bg-amber-100 px-1.5 text-sm font-bold text-amber-900 dark:bg-amber-900/50 dark:text-amber-100 font-mono">{id}</motion.span>)}
             </AnimatePresence>
             {!struct.items.length && <span className="self-center px-1 text-xs text-slate-400 dark:text-zinc-500">empty</span>}
           </div>
@@ -46,7 +46,7 @@ export default function GraphViz({ frame }) {
         {visited && (
           <div>
             <p className="eyebrow mb-1.5">Visited set (cycle guard)</p>
-            <div className="flex min-h-[40px] flex-wrap gap-1.5 rounded-xl bg-slate-100/60 p-2 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
+            <div className="flex min-h-[40px] flex-wrap gap-1.5 rounded-md bg-slate-100/60 p-2 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
               <AnimatePresence initial={false}>
                 {visited.map((id) => <motion.span layout key={id} initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} className="flex h-7 w-7 items-center justify-center rounded-md bg-sky-100 text-xs font-bold text-sky-900 dark:bg-sky-900/50 dark:text-sky-100">{id}</motion.span>)}
               </AnimatePresence>

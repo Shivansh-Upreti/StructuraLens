@@ -9,12 +9,12 @@ export default function BoardViz({ frame }) {
   return (
     <div>
       <div className="mb-3 flex flex-wrap gap-2 text-xs font-semibold">
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700 dark:bg-zinc-800 dark:text-zinc-200">placements: {placed}</span>
-        <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">backtracks: {backtracks}</span>
-        <span className="rounded-full bg-green-100 px-3 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300">solutions: {solutions.length}</span>
+        <span className="rounded-md bg-slate-100 px-3 py-1 text-slate-700 dark:bg-zinc-800 dark:text-zinc-200 font-mono">placements: {placed}</span>
+        <span className="rounded-md bg-amber-100 px-3 py-1 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-mono">backtracks: {backtracks}</span>
+        <span className="rounded-md bg-green-100 px-3 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300 font-mono">solutions: {solutions.length}</span>
       </div>
       <div className="relative mx-auto aspect-square w-full" style={{ maxWidth: 'min(460px, calc(var(--viz-h, 520px) - 100px))' }}>
-        <div className={`grid h-full w-full overflow-hidden rounded-xl ring-2 ${solved ? 'ring-green-500' : 'ring-slate-300 dark:ring-zinc-700'}`} style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }} role="img" aria-label={`${n} by ${n} board`}>
+        <div className={`grid h-full w-full overflow-hidden rounded-md ring-2 ${solved ? 'ring-green-500' : 'ring-slate-300 dark:ring-zinc-700'}`} style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }} role="img" aria-label={`${n} by ${n} board`}>
           {Array.from({ length: n * n }, (_, k) => {
             const r = Math.floor(k / n), c = k % n, dark = (r + c) % 2 === 1;
             const isTry = trying && trying.r === r && trying.c === c;

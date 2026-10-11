@@ -27,7 +27,7 @@ function Story({ preset, trace, idx }) {
     <div>
       <div className="flex items-center gap-3"><span className="text-4xl" aria-hidden="true">{m.emoji}</span><h3 className="text-lg font-bold text-slate-900 dark:text-white">{m.title}</h3></div>
       <p className="mt-2 text-slate-600 dark:text-zinc-300">{m.text}</p>
-      <div className="my-4 rounded-2xl bg-green-50 dark:bg-green-950/50 p-4 ring-1 ring-green-100 dark:ring-green-900">
+      <div className="my-4 rounded-lg bg-green-50 dark:bg-green-950/50 p-4 ring-1 ring-green-100 dark:ring-green-900">
         <p className="eyebrow text-green-700 dark:text-green-400">In the story, right now</p>
         <p className="mt-1 text-slate-800 dark:text-zinc-100">{parts ? <Parts parts={parts} /> : <span className="text-slate-400 dark:text-zinc-500">Step forward to see the story.</span>}</p>
       </div>
@@ -42,15 +42,15 @@ function Story({ preset, trace, idx }) {
 
 function Analysis({ preset, analysis: a, onFlash }) {
   const cur = preset.analysis;
-  const Stat = ({ k, v, t }) => <div title={t} className="rounded-2xl bg-slate-50 dark:bg-zinc-950 p-3 text-center ring-1 ring-slate-100 dark:ring-zinc-800"><div className="text-2xl font-extrabold text-green-700 dark:text-green-400">{v}</div><div className="text-[11px] text-slate-500 dark:text-zinc-400">{k}</div></div>;
-  const chip = (l, extra) => <button key={l + (extra || '')} type="button" onClick={() => onFlash(l)} className="rounded-lg bg-green-50 dark:bg-green-950/50 px-2 py-0.5 font-mono text-xs font-semibold text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-200 dark:ring-green-800 hover:bg-green-100 dark:hover:bg-green-900/50" title={extra}>{l}</button>;
+  const Stat = ({ k, v, t }) => <div title={t} className="rounded-lg bg-slate-50 dark:bg-zinc-950 p-3 text-center ring-1 ring-slate-100 dark:ring-zinc-800"><div className="text-2xl font-extrabold text-green-700 dark:text-green-400">{v}</div><div className="text-[11px] text-slate-500 dark:text-zinc-400">{k}</div></div>;
+  const chip = (l, extra) => <button key={l + (extra || '')} type="button" onClick={() => onFlash(l)} className="rounded-md bg-green-50 dark:bg-green-950/50 px-2 py-0.5 font-mono text-xs font-semibold text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-200 dark:ring-green-800 hover:bg-green-100 dark:hover:bg-green-900/50" title={extra}>{l}</button>;
   return (
     <div className="space-y-5 text-sm">
       <div>
         <h3 className="eyebrow mb-2">Classification <span className="ml-1 rounded bg-slate-100 dark:bg-zinc-800 px-1.5 py-px normal-case tracking-normal">heuristic</span></h3>
         <ul className="space-y-1.5 text-slate-600 dark:text-zinc-300">{a.badges.map((b) => <li key={b.label}><b className="text-slate-900 dark:text-white">{b.label}:</b> {b.hint}</li>)}</ul>
       </div>
-      {a.warnings.length > 0 && <div className="space-y-2">{a.warnings.map((w) => <p key={w} className="rounded-xl bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-amber-900 dark:text-amber-200 ring-1 ring-amber-200 dark:ring-amber-800">⚠ {w}</p>)}</div>}
+      {a.warnings.length > 0 && <div className="space-y-2">{a.warnings.map((w) => <p key={w} className="rounded-md bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-amber-900 dark:text-amber-200 ring-1 ring-amber-200 dark:ring-amber-800">⚠ {w}</p>)}</div>}
       <div>
         <h3 className="eyebrow mb-2">Measured on this input</h3>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -65,7 +65,7 @@ function Analysis({ preset, analysis: a, onFlash }) {
       </div>
       {a.complexity && <div><h3 className="eyebrow mb-1">Complexity {!a.complexity.curated && <span className="ml-1 rounded bg-slate-100 dark:bg-zinc-800 px-1.5 py-px normal-case tracking-normal">heuristic</span>}</h3><p><b>Time:</b> {a.complexity.time}</p><p><b>Space:</b> {a.complexity.space}</p></div>}
       {cur && <div><p><b>Alternatives:</b> {cur.alt}</p><h3 className="eyebrow mb-1 mt-4">Failure modes</h3><ul className="list-disc space-y-1 pl-5 text-slate-600 dark:text-zinc-300">{cur.pitfalls.map((x) => <li key={x}>{x}</li>)}</ul></div>}
-      <div className="rounded-2xl bg-green-50 dark:bg-green-950/50 p-4 ring-1 ring-green-100 dark:ring-green-900"><h3 className="eyebrow mb-1 text-green-700 dark:text-green-400">Think first</h3><ul className="list-disc space-y-1 pl-5 text-slate-800 dark:text-zinc-100">{preset.think.map((x) => <li key={x}>{x}</li>)}</ul></div>
+      <div className="rounded-lg bg-green-50 dark:bg-green-950/50 p-4 ring-1 ring-green-100 dark:ring-green-900"><h3 className="eyebrow mb-1 text-green-700 dark:text-green-400">Think first</h3><ul className="list-disc space-y-1 pl-5 text-slate-800 dark:text-zinc-100">{preset.think.map((x) => <li key={x}>{x}</li>)}</ul></div>
       <p className="text-xs text-slate-500 dark:text-zinc-400">Measurements describe this input only. Curated complexity claims are standard results; custom-code claims are heuristics. Verify before relying on them.</p>
     </div>
   );
@@ -76,7 +76,7 @@ function Output({ state, trace }) {
   return (
     <div className="text-sm">
       {state.out.length ? <ol className="list-decimal space-y-0.5 pl-6 font-mono text-[13px]">{state.out.map((o, i) => <li key={i}>{o}</li>)}</ol> : <p className="text-slate-400 dark:text-zinc-500">Nothing printed yet. Hanoi, Subsets, Countdown and your own print() calls write here.</p>}
-      {done && <p className="mt-4 rounded-2xl bg-green-50 dark:bg-green-950/50 px-4 py-3 text-green-900 dark:text-green-200 ring-1 ring-green-200 dark:ring-green-800">{trace.result !== undefined ? <>Result: <b>{fmt(trace.result, 80)}</b></> : 'Finished (no return value).'}</p>}
+      {done && <p className="mt-4 rounded-lg bg-green-50 dark:bg-green-950/50 px-4 py-3 text-green-900 dark:text-green-200 ring-1 ring-green-200 dark:ring-green-800">{trace.result !== undefined ? <>Result: <b>{fmt(trace.result, 80)}</b></> : 'Finished (no return value).'}</p>}
     </div>
   );
 }

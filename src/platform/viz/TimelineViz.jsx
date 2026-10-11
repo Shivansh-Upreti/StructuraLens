@@ -15,7 +15,7 @@ export default function TimelineViz({ frame }) {
   return (
     <div>
       <p className="mb-3 text-xs font-semibold text-slate-500 dark:text-zinc-400">{sorted ? 'Sorted by finish time (the greedy key)' : 'Input order'}</p>
-      <div className="relative rounded-xl bg-slate-100/60 py-3 pl-[74px] pr-3 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
+      <div className="relative rounded-md bg-slate-100/60 py-3 pl-[74px] pr-3 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
         {last !== null && <motion.div aria-hidden="true" className="absolute bottom-7 top-3 w-0 border-l-2 border-dashed border-green-600 dark:border-green-400" initial={false} animate={{ left: `calc(74px + (100% - 74px - 12px) * ${last / tmax})` }} transition={{ type: 'spring', stiffness: 220, damping: 26 }}><span className="absolute -top-0.5 left-1 whitespace-nowrap rounded bg-green-600 px-1 text-[10px] font-bold text-white">last = {last}</span></motion.div>}
         <div className="space-y-1">
           {acts.map((a) => (
@@ -31,7 +31,7 @@ export default function TimelineViz({ frame }) {
           ))}
         </div>
         <div className="relative mt-2 h-4 border-t border-slate-300 dark:border-zinc-700">
-          {ticks.map((t, i) => <span key={i} className="absolute -translate-x-1/2 text-[10px] tabular-nums text-slate-400 dark:text-zinc-500" style={{ left: `${(t / tmax) * 100}%` }}>{t}</span>)}
+          {ticks.map((t, i) => <span key={i} className="absolute -translate-x-1/2 text-[10px] tabular-nums text-slate-400 dark:text-zinc-500 font-mono" style={{ left: `${(t / tmax) * 100}%` }}>{t}</span>)}
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-zinc-400">

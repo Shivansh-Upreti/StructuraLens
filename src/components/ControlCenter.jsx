@@ -45,8 +45,8 @@ export default function ControlCenter({ preset, vals, onPreset, onParam, onRun, 
         </div>
         <dl className="grid grid-cols-3 gap-3 text-center" aria-label="Run statistics">
           {[['Calls', st.calls], ['Max depth', st.maxDepth], ['Base cases', st.baseCalls]].map(([k, v]) => (
-            <div key={k} className="min-w-[88px] rounded-2xl bg-slate-50 dark:bg-zinc-950 px-3 py-2 ring-1 ring-slate-100 dark:ring-zinc-800">
-              <dd className="text-2xl font-extrabold text-green-700 dark:text-green-400">{v}</dd><dt className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">{k}</dt>
+            <div key={k} className="min-w-[88px] rounded-lg bg-slate-50 dark:bg-zinc-950 px-3 py-2 ring-1 ring-slate-100 dark:ring-zinc-800">
+              <dd className="font-mono text-2xl font-extrabold text-green-700 dark:text-green-400">{v}</dd><dt className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">{k}</dt>
             </div>
           ))}
         </dl>

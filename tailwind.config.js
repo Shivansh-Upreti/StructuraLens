@@ -4,16 +4,17 @@ export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
+      // Developer-tool typography: a clean grotesque for UI and headings, a strict monospace for metrics, counters and tags.
+      // System stacks only (no webfont download, so the strict CSP and offline use keep working); Inter / Geist /
+      // JetBrains Mono are used automatically when installed.
       fontFamily: {
-        sans: ['"Segoe UI"', 'system-ui', '-apple-system', 'Roboto', 'sans-serif'],
-        serif: ['"Iowan Old Style"', '"Palatino Linotype"', 'Palatino', 'Georgia', 'serif'],
-        mono: ['ui-monospace', '"Cascadia Code"', 'Consolas', 'Menlo', 'monospace'],
+        sans: ['Inter', 'Geist', '"Geist Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        mono: ['"JetBrains Mono"', '"Geist Mono"', '"Fira Code"', 'ui-monospace', '"Cascadia Code"', 'Consolas', 'Menlo', 'monospace'],
       },
-      // Palette: "neon ink". Components use slate (light neutrals), zinc (dark neutrals) and green (accent) by habit;
-      // remapping the scales re-themes the whole app from one place. green is now CYAN, violet is the secondary accent.
+      // Palette: neutral greys (Tailwind zinc/slate defaults) plus ONE sharp accent. Components reach for `green` by habit,
+      // so remapping that single scale to emerald re-themes every active state, link and focus ring at once.
       colors: {
-        zinc: { 50: '#f4f4fb', 100: '#e8e8f5', 200: '#d0d0e6', 300: '#b3b3d1', 400: '#9494b8', 500: '#6e6e96', 600: '#4a4a6e', 700: '#2c2c47', 800: '#1a1a2e', 900: '#0f0f1c', 950: '#07070e' },
-        green: { 50: '#ecfeff', 100: '#cffafe', 200: '#a5f3fc', 300: '#67e8f9', 400: '#22d3ee', 500: '#0891b2', 600: '#0e7490', 700: '#155e75', 800: '#164e63', 900: '#0c3b4d', 950: '#06222e' },
+        green: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' },
       },
     },
   },

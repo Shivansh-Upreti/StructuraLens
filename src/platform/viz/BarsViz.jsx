@@ -15,21 +15,21 @@ export default function BarsViz({ frame }) {
   const h = (v) => 28 + ((v - min) / (max - min || 1)) * 190;
   return (
     <div>
-      <div className="flex h-[270px] items-end justify-center gap-1.5 rounded-xl bg-slate-100/60 px-3 pb-3 pt-6 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800" role="img" aria-label={`Bars: ${vals.join(', ')}`}>
+      <div className="flex h-[270px] items-end justify-center gap-1.5 rounded-md bg-slate-100/60 px-3 pb-3 pt-6 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800" role="img" aria-label={`Bars: ${vals.join(', ')}`}>
         {items.map((it, i) => {
           const out = range && (i < range[0] || i > range[1]);
           return (
             <motion.div key={it.id} layout transition={{ type: 'spring', stiffness: 380, damping: 32 }} className={`flex min-w-0 max-w-[56px] flex-1 flex-col items-center justify-end ${split !== null && i === split ? 'mr-4' : ''}`} style={{ opacity: out ? 0.28 : 1 }}>
-              <span className="mb-1 text-xs font-semibold tabular-nums text-slate-700 dark:text-zinc-200">{it.v}</span>
+              <span className="mb-1 text-xs font-semibold tabular-nums text-slate-700 dark:text-zinc-200 font-mono">{it.v}</span>
               <motion.div className={`w-full rounded-t-md ${MARK[mark[it.id]] || 'bg-slate-400 dark:bg-zinc-500'}`} animate={{ height: h(it.v) }} transition={{ duration: 0.25 }} />
-              <span className="mt-1 text-[10px] tabular-nums text-slate-400 dark:text-zinc-500">{i}</span>
+              <span className="mt-1 text-[10px] tabular-nums text-slate-400 dark:text-zinc-500 font-mono">{i}</span>
             </motion.div>
           );
         })}
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-zinc-400">
         <div className="flex flex-wrap gap-x-4 gap-y-1">{LEGEND.map(([c, t]) => <span key={t}><i className={`mr-1.5 inline-block h-2.5 w-2.5 rounded-full ${c}`} />{t}</span>)}</div>
-        {range && <span className="tabular-nums">active range [{range[0]}..{range[1]}] · depth {depth}</span>}
+        {range && <span className="tabular-nums font-mono">active range [{range[0]}..{range[1]}] · depth {depth}</span>}
       </div>
     </div>
   );

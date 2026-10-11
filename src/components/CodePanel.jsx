@@ -41,7 +41,7 @@ export default function CodePanel({ title, source, state, flash, editing, draft,
           onChange={(e) => onDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Tab') { e.preventDefault(); const t = e.currentTarget, s = t.selectionStart; t.setRangeText('  ', s, t.selectionEnd, 'end'); onDraft(t.value); } }} />
       ) : (
-        <div ref={box} className="max-h-[340px] overflow-auto rounded-xl bg-slate-50 dark:bg-zinc-950 py-2 font-mono text-[13px] ring-1 ring-slate-100 dark:ring-zinc-800" tabIndex={0} aria-label="Code with current line highlighted">
+        <div ref={box} className="max-h-[340px] overflow-auto rounded-md bg-slate-50 dark:bg-zinc-950 py-2 font-mono text-[13px] ring-1 ring-slate-100 dark:ring-zinc-800" tabIndex={0} aria-label="Code with current line highlighted">
           <div className="relative min-w-max">
             {kind && <motion.div aria-hidden="true" className={`absolute inset-x-0 top-0 z-0 border-l-4 ${BAR[kind]}`} style={{ height: ROW }} initial={false} animate={{ y: (line - 1) * ROW }} transition={{ type: 'spring', stiffness: 420, damping: 38 }} />}
             {flash && <motion.div key={flash.n} aria-hidden="true" className="absolute inset-x-0 top-0 z-0 bg-green-300/60 dark:bg-green-500/40" style={{ height: ROW, y: (flash.line - 1) * ROW }} initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 1.1 }} />}
@@ -51,7 +51,7 @@ export default function CodePanel({ title, source, state, flash, editing, draft,
                 <div key={i} style={{ height: ROW }} className={`relative z-10 flex items-center whitespace-pre border-l-4 pr-3 ${paused ? 'border-amber-400 bg-amber-50/80 dark:bg-amber-950/40' : 'border-transparent'}`}>
                   <span className="w-10 flex-none select-none pr-3 text-right text-slate-400 dark:text-zinc-500">{n}</span>
                   <span className="flex-1">{ln ? tokenize(ln).map(([w, c], j) => <span key={j} className={c}>{w}</span>) : ' '}</span>
-                  {paused ? <span className="ml-3 rounded-full bg-amber-100 dark:bg-amber-900/40 px-2 py-px font-sans text-[11px] font-semibold text-amber-800 dark:text-amber-300" title={`${paused} frame(s) are paused on this line`}>⏸ ×{paused}</span> : null}
+                  {paused ? <span className="ml-3 rounded-md bg-amber-100 dark:bg-amber-900/40 px-2 py-px font-sans text-[11px] font-semibold text-amber-800 dark:text-amber-300 font-mono" title={`${paused} frame(s) are paused on this line`}>⏸ ×{paused}</span> : null}
                 </div>
               );
             })}

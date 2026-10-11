@@ -9,10 +9,10 @@ export default function TableViz({ frame }) {
   return (
     <div>
       <div className="mb-3 flex min-h-[28px] flex-wrap items-center gap-2 text-sm">
-        {formula && <span className="rounded-full bg-amber-100 px-3 py-1 font-mono font-semibold text-amber-900 dark:bg-amber-900/40 dark:text-amber-200">{formula}</span>}
-        {answer !== null && <span className="rounded-full bg-green-100 px-3 py-1 font-semibold text-green-800 dark:bg-green-900/40 dark:text-green-300">answer = {answer}</span>}
+        {formula && <span className="rounded-md bg-amber-100 px-3 py-1 font-mono font-semibold text-amber-900 dark:bg-amber-900/40 dark:text-amber-200">{formula}</span>}
+        {answer !== null && <span className="rounded-md bg-green-100 px-3 py-1 font-semibold text-green-800 dark:bg-green-900/40 dark:text-green-300 font-mono">answer = {answer}</span>}
       </div>
-      <div className="max-h-[420px] overflow-auto rounded-xl bg-slate-100/60 p-2 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
+      <div className="max-h-[420px] overflow-auto rounded-md bg-slate-100/60 p-2 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
         <table className="mx-auto border-separate border-spacing-1 text-center text-sm" aria-label="Dynamic programming table">
           <thead><tr><th />{cols.map((c, j) => <th key={j} className="px-1 font-mono text-xs font-semibold text-slate-500 dark:text-zinc-400">{c}</th>)}</tr></thead>
           <tbody>

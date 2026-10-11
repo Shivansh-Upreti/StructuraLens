@@ -14,7 +14,7 @@ function Cell({ ch, tone, label }) {
   return (
     <div className="flex flex-col items-center" style={{ width: CELL }}>
       <div className={`flex h-9 w-[30px] items-center justify-center rounded-md border-2 font-mono text-sm font-bold ${cls}`}>{ch}</div>
-      <span className="mt-0.5 h-3 text-[9px] tabular-nums text-slate-400 dark:text-zinc-500">{label}</span>
+      <span className="mt-0.5 h-3 text-[9px] tabular-nums text-slate-400 dark:text-zinc-500 font-mono">{label}</span>
     </div>
   );
 }
@@ -25,11 +25,11 @@ export default function StrMatchViz({ frame }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2 text-xs font-semibold">
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700 dark:bg-zinc-800 dark:text-zinc-200">phase: {phase === 'lps' ? 'build lps table' : 'search'}</span>
-        {phase === 'search' && <span className="rounded-full bg-slate-100 px-3 py-1 tabular-nums text-slate-700 dark:bg-zinc-800 dark:text-zinc-200">i = {i}, j = {j}</span>}
-        {found && <span className="rounded-full bg-green-100 px-3 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300">found at index {found[0]}</span>}
+        <span className="rounded-md bg-slate-100 px-3 py-1 text-slate-700 dark:bg-zinc-800 dark:text-zinc-200 font-mono">phase: {phase === 'lps' ? 'build lps table' : 'search'}</span>
+        {phase === 'search' && <span className="rounded-md bg-slate-100 px-3 py-1 tabular-nums text-slate-700 dark:bg-zinc-800 dark:text-zinc-200 font-mono">i = {i}, j = {j}</span>}
+        {found && <span className="rounded-md bg-green-100 px-3 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300 font-mono">found at index {found[0]}</span>}
       </div>
-      <div className="overflow-x-auto rounded-xl bg-slate-100/60 p-3 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
+      <div className="overflow-x-auto rounded-md bg-slate-100/60 p-3 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
         {phase === 'search' && (
           <>
             <p className="eyebrow mb-1">Text</p>

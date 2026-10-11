@@ -76,7 +76,7 @@ export default function TreeView({ trace, state }) {
         <span>drag to pan · wheel to zoom</span>
         <button type="button" className="btn !px-2.5 !py-1 text-xs" onClick={fit}>Fit &amp; follow</button>
       </div>
-      <div ref={host} className="relative min-h-[300px] flex-1 cursor-grab touch-none overflow-hidden rounded-xl bg-dots bg-slate-50 dark:bg-zinc-950 ring-1 ring-slate-100 dark:ring-zinc-800 active:cursor-grabbing"
+      <div ref={host} className="relative min-h-[300px] flex-1 cursor-grab touch-none overflow-hidden rounded-md bg-dots bg-slate-50 dark:bg-zinc-950 ring-1 ring-slate-100 dark:ring-zinc-800 active:cursor-grabbing"
         onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
         <svg className="h-full w-full" role="img" aria-label="Recursion tree">
           <motion.g style={{ originX: 0, originY: 0 }} animate={{ x: view.x, y: view.y, scale: view.k }} transition={dragging ? { duration: 0 } : { type: 'spring', stiffness: 170, damping: 26 }}>

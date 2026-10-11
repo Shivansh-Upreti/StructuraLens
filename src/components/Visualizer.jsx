@@ -12,10 +12,10 @@ export default function Visualizer({ trace, state }) {
     <section className="card flex min-h-[560px] min-w-0 flex-col" aria-label="Visualizer">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-base font-bold text-slate-900 dark:text-white">Visualizer</h2>
-        <div className="inline-flex rounded-xl bg-slate-100 dark:bg-zinc-800 p-1" role="group" aria-label="Visualization view">
+        <div className="inline-flex rounded-md bg-slate-100 dark:bg-zinc-800 p-1" role="group" aria-label="Visualization view">
           {VIEWS.map(([id, text]) => (
-            <button key={id} type="button" aria-pressed={view === id} onClick={() => setView(id)} className={`relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${view === id ? 'text-green-700 dark:text-green-400' : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-100'}`}>
-              {view === id && <motion.span layoutId="view-pill" className="absolute inset-0 rounded-lg bg-white dark:bg-zinc-900 shadow" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
+            <button key={id} type="button" aria-pressed={view === id} onClick={() => setView(id)} className={`relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${view === id ? 'text-green-700 dark:text-green-400' : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-100'}`}>
+              {view === id && <motion.span layoutId="view-pill" className="absolute inset-0 rounded-md bg-white dark:bg-zinc-900" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
               <span className="relative">{text}</span>
             </button>
           ))}

@@ -14,13 +14,13 @@ const OPTIONS = [['light', 'Light', Sun], ['system', 'System', Monitor], ['dark'
 function ThemeToggle() {
   const { mode, setMode } = useTheme();
   return (
-    <div className="relative inline-flex rounded-full bg-slate-100 p-0.5 ring-1 ring-slate-200 dark:bg-zinc-800 dark:ring-zinc-700" role="radiogroup" aria-label="Color theme">
+    <div className="relative inline-flex rounded-md bg-slate-100 p-0.5 ring-1 ring-slate-200 dark:bg-zinc-800 dark:ring-zinc-700" role="radiogroup" aria-label="Color theme">
       {OPTIONS.map(([id, text, Icon]) => {
         const on = mode === id;
         return (
           <button key={id} type="button" role="radio" aria-checked={on} aria-label={`${text} theme`} title={`${text} theme`} onClick={() => setMode(id)}
-            className={`relative flex h-7 w-7 items-center justify-center rounded-full transition-colors lg:h-8 lg:w-8 ${on ? 'text-green-700 dark:text-green-400' : 'text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100'}`}>
-            {on && <motion.span layoutId="theme-pill" className="absolute inset-0 rounded-full bg-white shadow dark:bg-zinc-950" transition={{ type: 'spring', stiffness: 420, damping: 32 }} />}
+            className={`relative flex h-7 w-7 items-center justify-center rounded-md transition-colors lg:h-8 lg:w-8 ${on ? 'text-green-700 dark:text-green-400' : 'text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100'}`}>
+            {on && <motion.span layoutId="theme-pill" className="absolute inset-0 rounded-md bg-white dark:bg-zinc-950" transition={{ type: 'spring', stiffness: 420, damping: 32 }} />}
             <span className="relative"><Icon /></span>
           </button>
         );
@@ -43,20 +43,20 @@ function TopicsMenu({ route }) {
   const current = topicById(route);
   return (
     <div className="relative" ref={box}>
-      <button type="button" className="btn !rounded-full !py-1.5" aria-haspopup="true" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button type="button" className="btn !rounded-md !py-1.5" aria-haspopup="true" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {current ? current.title : 'Topics'}
         <svg viewBox="0 0 24 24" {...ICON} width="14" height="14" className={`transition-transform ${open ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6" /></svg>
       </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ opacity: 0, y: -6, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.14 }}
-            className="absolute right-0 z-50 mt-2 grid w-[min(94vw,760px)] gap-5 rounded-2xl bg-white p-4 shadow-xl ring-1 ring-slate-200 dark:bg-zinc-900 dark:ring-zinc-700 sm:grid-cols-3">
+            className="absolute right-0 z-50 mt-2 grid w-[min(94vw,760px)] gap-5 rounded-lg bg-white p-4 ring-1 ring-slate-200 dark:bg-zinc-900 dark:ring-zinc-700 sm:grid-cols-3">
             {TIERS.map((b) => (
               <div key={b.id}>
-                <p className="eyebrow mb-2 flex items-center gap-1.5">{b.kicker} · {b.title.split(' ').slice(0, 3).join(' ')}{b.advanced && <span className="rounded-full bg-amber-100 px-1.5 py-px text-[9px] font-bold tracking-wider text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">ADVANCED</span>}</p>
+                <p className="eyebrow mb-2 flex items-center gap-1.5">{b.kicker} · {b.title.split(' ').slice(0, 3).join(' ')}{b.advanced && <span className="rounded-md bg-amber-100 px-1.5 py-px text-[9px] font-bold tracking-wider text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-mono">ADVANCED</span>}</p>
                 <ul className="space-y-0.5">
                   {b.topics.map((t) => (
-                    <li key={t.id}><a href={href(t.id)} className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-sm font-medium hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-950/50 dark:hover:text-green-400 ${route === t.id ? 'bg-green-50 text-green-700 dark:bg-green-950/50 dark:text-green-400' : 'text-slate-700 dark:text-zinc-200'}`}>{t.title}{t.status === 'preview' && <span className="rounded-full bg-slate-100 px-1.5 py-px text-[9px] font-semibold uppercase text-slate-500 dark:bg-zinc-800 dark:text-zinc-400">preview</span>}</a></li>
+                    <li key={t.id}><a href={href(t.id)} className={`flex items-center justify-between rounded-md px-2.5 py-1.5 text-sm font-medium hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-950/50 dark:hover:text-green-400 ${route === t.id ? 'bg-green-50 text-green-700 dark:bg-green-950/50 dark:text-green-400' : 'text-slate-700 dark:text-zinc-200'}`}>{t.title}{t.status === 'preview' && <span className="rounded-md bg-slate-100 px-1.5 py-px text-[9px] font-semibold uppercase text-slate-500 dark:bg-zinc-800 dark:text-zinc-400 font-mono">preview</span>}</a></li>
                   ))}
                 </ul>
               </div>
@@ -80,7 +80,7 @@ function MobileMenu({ route }) {
   }, [open]);
   return (
     <div className="lg:hidden">
-      <button type="button" className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-700 ring-1 ring-slate-200 dark:text-zinc-200 dark:ring-zinc-700" aria-label={open ? 'Close menu' : 'Open topics menu'} aria-expanded={open} aria-controls="mobile-topics" onClick={() => setOpen((o) => !o)}>
+      <button type="button" className="flex h-9 w-9 items-center justify-center rounded-md text-slate-700 ring-1 ring-slate-200 dark:text-zinc-200 dark:ring-zinc-700" aria-label={open ? 'Close menu' : 'Open topics menu'} aria-expanded={open} aria-controls="mobile-topics" onClick={() => setOpen((o) => !o)}>
         <svg viewBox="0 0 24 24" {...ICON} width="20" height="20">{open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}</svg>
       </button>
       <AnimatePresence>
@@ -88,14 +88,14 @@ function MobileMenu({ route }) {
           <>
             <motion.button type="button" aria-label="Close menu" className="fixed inset-x-0 bottom-0 top-14 z-40 bg-black/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} />
             <motion.nav id="mobile-topics" aria-label="Topics" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.16 }}
-              className="fixed inset-x-0 top-14 z-50 max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b border-slate-200 bg-white px-4 pb-6 pt-3 shadow-xl dark:border-zinc-800 dark:bg-zinc-950">
-              <a href={href('')} className="mb-2 block rounded-lg px-2.5 py-2 text-sm font-semibold text-slate-700 hover:bg-green-50 dark:text-zinc-200 dark:hover:bg-green-950/50">Home · all topics</a>
+              className="fixed inset-x-0 top-14 z-50 max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b border-slate-200 bg-white px-4 pb-6 pt-3 dark:border-zinc-800 dark:bg-zinc-950">
+              <a href={href('')} className="mb-2 block rounded-md px-2.5 py-2 text-sm font-semibold text-slate-700 hover:bg-green-50 dark:text-zinc-200 dark:hover:bg-green-950/50">Home · all topics</a>
               {TIERS.map((b) => (
                 <div key={b.id} className="mt-3">
-                  <p className="eyebrow mb-1 flex items-center gap-1.5 px-2.5">{b.kicker} · {b.title}{b.advanced && <span className="rounded-full bg-amber-100 px-1.5 py-px text-[9px] font-bold tracking-wider text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">ADVANCED</span>}</p>
+                  <p className="eyebrow mb-1 flex items-center gap-1.5 px-2.5">{b.kicker} · {b.title}{b.advanced && <span className="rounded-md bg-amber-100 px-1.5 py-px text-[9px] font-bold tracking-wider text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-mono">ADVANCED</span>}</p>
                   <ul>
                     {b.topics.map((t) => (
-                      <li key={t.id}><a href={href(t.id)} className={`flex items-center justify-between rounded-lg px-2.5 py-2.5 text-[15px] font-medium ${route === t.id ? 'bg-green-50 text-green-700 dark:bg-green-950/50 dark:text-green-300' : 'text-slate-700 dark:text-zinc-200'}`}>{t.title}{t.status === 'preview' && <span className="rounded-full bg-slate-100 px-1.5 py-px text-[9px] font-semibold uppercase text-slate-500 dark:bg-zinc-800 dark:text-zinc-400">preview</span>}</a></li>
+                      <li key={t.id}><a href={href(t.id)} className={`flex items-center justify-between rounded-md px-2.5 py-2.5 text-[15px] font-medium ${route === t.id ? 'bg-green-50 text-green-700 dark:bg-green-950/50 dark:text-green-300' : 'text-slate-700 dark:text-zinc-200'}`}>{t.title}{t.status === 'preview' && <span className="rounded-md bg-slate-100 px-1.5 py-px text-[9px] font-semibold uppercase text-slate-500 dark:bg-zinc-800 dark:text-zinc-400 font-mono">preview</span>}</a></li>
                     ))}
                   </ul>
                 </div>
@@ -114,7 +114,7 @@ export default function Navbar({ route }) {
       <div className="mx-auto flex h-14 max-w-[1500px] items-center gap-2 px-3 lg:gap-3 lg:px-5">
         <a href={href('')} className="flex min-w-0 items-center gap-2 lg:gap-2.5" aria-label="StructuraLens home">
           <Logo size={34} className="h-[30px] w-[30px] flex-none lg:h-[34px] lg:w-[34px]" />
-          <span className="font-serif text-lg font-semibold tracking-tight text-slate-900 dark:text-white lg:text-xl">Structura<span className="bg-gradient-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent dark:from-cyan-300 dark:to-violet-400">Lens</span></span>
+          <span className=" text-lg font-semibold tracking-tight text-slate-900 dark:text-white lg:text-xl">Structura<span>Lens</span></span>
         </a>
         <div className="ml-auto flex items-center gap-2 lg:gap-3">
           <div className="hidden lg:block"><TopicsMenu route={route} /></div>

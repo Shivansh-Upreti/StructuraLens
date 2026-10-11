@@ -36,7 +36,7 @@ export default function GrowthViz({ frame }) {
   })();
   return (
     <div>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ maxHeight: 'calc(var(--viz-h, 520px) - 100px)' }} className="mx-auto w-full rounded-xl bg-slate-100/60 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800" role="img" aria-label="Growth chart">
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ maxHeight: 'calc(var(--viz-h, 520px) - 100px)' }} className="mx-auto w-full rounded-md bg-slate-100/60 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800" role="img" aria-label="Growth chart">
         {yTicks.map((t) => <g key={t}><line x1={L} x2={W - R} y1={Y(t)} y2={Y(t)} className="stroke-slate-200 dark:stroke-zinc-800" /><text x={L - 6} y={Y(t) + 3} textAnchor="end" className="fill-slate-500 text-[9px] dark:fill-zinc-400">{t}</text></g>)}
         {xTicks.map((t) => <text key={t} x={X(t)} y={H - 14} textAnchor="middle" className="fill-slate-500 text-[9px] dark:fill-zinc-400">{t}</text>)}
         <text x={(L + W - R) / 2} y={H - 3} textAnchor="middle" className="fill-slate-500 text-[9px] dark:fill-zinc-400">input size n</text>
@@ -58,8 +58,8 @@ export default function GrowthViz({ frame }) {
       </div>
       {table.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-zinc-800 dark:text-zinc-200">n = {n}</span>
-          {table.map(([k, v]) => <span key={k} className="rounded-full bg-slate-100 px-3 py-1 font-mono text-xs text-slate-700 dark:bg-zinc-800 dark:text-zinc-200">{k}: {v}</span>)}
+          <span className="rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-zinc-800 dark:text-zinc-200 font-mono">n = {n}</span>
+          {table.map(([k, v]) => <span key={k} className="rounded-md bg-slate-100 px-3 py-1 font-mono text-xs text-slate-700 dark:bg-zinc-800 dark:text-zinc-200">{k}: {v}</span>)}
         </div>
       )}
     </div>

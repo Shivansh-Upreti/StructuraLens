@@ -32,8 +32,8 @@ export default function WhyPanel({ desc, stepKey, prediction, feedback, error })
             </>
           ) : <p className="mt-1.5 leading-relaxed text-slate-700 dark:text-zinc-200"><Parts parts={desc.parts} /></p>}
       </motion.div>
-      {feedback && <p className={`mt-3 rounded-xl px-3 py-2 text-sm ${feedback.ok ? 'bg-green-50 dark:bg-green-950/50 text-green-900 dark:text-green-200' : 'bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200'}`}>{feedback.ok ? '✔ ' : '✘ '}{feedback.text}</p>}
-      {error && <p className="mt-3 rounded-xl bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-900 dark:text-red-200">Your code threw: {error}</p>}
+      {feedback && <p className={`mt-3 rounded-md px-3 py-2 text-sm ${feedback.ok ? 'bg-green-50 dark:bg-green-950/50 text-green-900 dark:text-green-200' : 'bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200'}`}>{feedback.ok ? '✔ ' : '✘ '}{feedback.text}</p>}
+      {error && <p className="mt-3 rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-900 dark:text-red-200">Your code threw: {error}</p>}
     </section>
   );
 }

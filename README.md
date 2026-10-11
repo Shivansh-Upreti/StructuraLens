@@ -1,6 +1,6 @@
 # StructuraLens 🚀
 
-> **Live Production URL:** [https://structuralens.netlify.app/](https://structuralens.netlify.app/)
+> **Live Production URL:** [https://recursio.netlify.app](https://recursio.netlify.app)
 
 **StructuraLens** is a client-side DS & DAA visual learning platform for computer science students. It makes the concepts that are hardest to picture (recursion, sorting, searching, two pointers, backtracking, greedy, dynamic programming and graph traversals) visible, step by step, with code and animation moving in lock-step. It grew out of the original *Recursio* recursion visualizer, which lives on unchanged as the **Recursion** topic.
 

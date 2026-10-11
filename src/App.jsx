@@ -19,9 +19,9 @@ function NotFound({ route }) {
   const t = topicById(route);
   return (
     <div className="mx-auto max-w-[900px] px-5 py-24 text-center">
-      <h1 className="font-serif text-4xl font-semibold text-slate-900 dark:text-white">{t ? `${t.title} is coming soon` : 'Page not found'}</h1>
+      <h1 className=" text-4xl font-semibold text-slate-900 dark:text-white">{t ? `${t.title} is coming soon` : 'Page not found'}</h1>
       <p className="mt-3 text-slate-600 dark:text-zinc-300">{t ? 'This topic is on the roadmap but has no interactive module yet.' : 'That topic does not exist.'}</p>
-      <a href={href('')} className="btn btn-primary mt-6 !rounded-full">← Back to all topics</a>
+      <a href={href('')} className="btn btn-primary mt-6 !rounded-md">← Back to all topics</a>
     </div>
   );
 }

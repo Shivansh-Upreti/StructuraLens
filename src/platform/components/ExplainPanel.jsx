@@ -17,11 +17,11 @@ const MODES = [['beginner', 'Beginner'], ['advanced', 'Advanced']];
 /* Compact segmented control. Intentionally NOT rendered on the legacy Recursion page. */
 export function ModeToggle({ mode, onMode }) {
   return (
-    <div className="inline-flex rounded-full bg-slate-100 p-0.5 ring-1 ring-slate-200 dark:bg-zinc-800 dark:ring-zinc-700" role="radiogroup" aria-label="Explanation level">
+    <div className="inline-flex rounded-md bg-slate-100 p-0.5 ring-1 ring-slate-200 dark:bg-zinc-800 dark:ring-zinc-700" role="radiogroup" aria-label="Explanation level">
       {MODES.map(([id, text]) => (
         <button key={id} type="button" role="radio" aria-checked={mode === id} onClick={() => onMode(id)} title={id === 'beginner' ? 'Analogies and plain language' : 'Complexity, proofs and trade-offs'}
-          className={`relative rounded-full px-3 py-1 text-xs font-semibold transition-colors ${mode === id ? 'text-green-700 dark:text-green-300' : 'text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100'}`}>
-          {mode === id && <motion.span layoutId="explain-pill" className="absolute inset-0 rounded-full bg-white shadow dark:bg-zinc-950" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
+          className={`relative rounded-md px-3 py-1 text-xs font-semibold transition-colors ${mode === id ? 'text-green-700 dark:text-green-300' : 'text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100'}`}>
+          {mode === id && <motion.span layoutId="explain-pill" className="absolute inset-0 rounded-md bg-white dark:bg-zinc-950" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
           <span className="relative">{text}</span>
         </button>
       ))}
@@ -39,7 +39,7 @@ export default function ExplainPanel({ moduleId, algo, kind, mode, placeholderLi
       {!ex && <p className="text-slate-500 dark:text-zinc-400">No written explanation for this algorithm yet.</p>}
       {ex && beginner && (
         <>
-          <div className="rounded-2xl bg-green-50 p-4 ring-1 ring-green-100 dark:bg-green-950/50 dark:ring-green-900">
+          <div className="rounded-lg bg-green-50 p-4 ring-1 ring-green-100 dark:bg-green-950/50 dark:ring-green-900">
             <p className="eyebrow mb-1 text-green-700 dark:text-green-400">Think of it like this</p>
             <p className="text-[15px]">{ex.b.analogy}</p>
           </div>
@@ -54,12 +54,12 @@ export default function ExplainPanel({ moduleId, algo, kind, mode, placeholderLi
           <p className="text-[15px]">{ex.a.summary}</p>
           <ul className="list-disc space-y-2 pl-5 marker:text-green-700 dark:marker:text-green-400">{ex.a.points.map((s) => <li key={s}>{s}</li>)}</ul>
           <div className="flex flex-wrap gap-2">
-            {[['Time', algo.complexity.time], ['Space', algo.complexity.space]].map(([k, v]) => <span key={k} className="rounded-xl bg-slate-100 px-3 py-1.5 text-xs dark:bg-zinc-800"><b className="mr-1 text-slate-900 dark:text-white">{k}</b>{v}</span>)}
+            {[['Time', algo.complexity.time], ['Space', algo.complexity.space]].map(([k, v]) => <span key={k} className="rounded-md bg-slate-100 px-3 py-1.5 text-xs dark:bg-zinc-800 font-mono"><b className="mr-1 text-slate-900 dark:text-white">{k}</b>{v}</span>)}
           </div>
         </>
       )}
       {(placeholderLine || hint) && (
-        <div className="rounded-2xl border border-dashed border-slate-300 p-3 dark:border-zinc-700">
+        <div className="rounded-lg border border-dashed border-slate-300 p-3 dark:border-zinc-700">
           <p className="eyebrow mb-1">{placeholderLine ? 'This line' : 'This step'}</p>
           <p>{placeholderLine || hint}</p>
         </div>

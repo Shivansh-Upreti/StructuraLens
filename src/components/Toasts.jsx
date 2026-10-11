@@ -10,7 +10,7 @@ function Toast({ t, onClose }) {
   useEffect(() => { const id = setTimeout(() => onClose(t.id), 9000); return () => clearTimeout(id); }, [t.id, onClose]);
   return (
     <motion.div layout initial={{ opacity: 0, x: 40, scale: 0.96 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 40 }} transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-      className={`pointer-events-auto w-[340px] max-w-[calc(100vw-2rem)] rounded-2xl border p-3.5 shadow-lg ${TONES[t.tone] || TONES.warn}`}>
+      className={`pointer-events-auto w-[340px] max-w-[calc(100vw-2rem)] rounded-lg border p-3.5 ${TONES[t.tone] || TONES.warn}`}>
       <div className="flex items-start gap-2">
         <span aria-hidden="true" className="mt-0.5">{t.tone === 'error' ? '⛔' : '⚠️'}</span>
         <div className="min-w-0 flex-1">

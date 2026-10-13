@@ -12,6 +12,10 @@ import InsightTabs from '../../components/InsightTabs.jsx';
 import PlaybackBar from '../../components/PlaybackBar.jsx';
 import Toasts from '../../components/Toasts.jsx';
 import MobileTabs from '../../platform/components/MobileTabs.jsx';
+import CustomCodeWorkspace from '../../platform/components/CustomCodeWorkspace.jsx';
+import LogicFeedbackCard from '../../components/LogicFeedbackCard.jsx';
+import { validateRecursion } from '../../engine/logicValidator.js';
+import { RECURSION_EXAMPLES } from '../../engine/recursionExamples.js';
 
 const defaults = (pr) => Object.fromEntries(pr.params.map((p) => [p.key, p.def]));
 
@@ -46,6 +50,7 @@ export default function RecursionPage() {
   const [editing, setEditing] = useState(false);
   const [customTrace, setCustomTrace] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [correction, setCorrection] = useState(false);   // Suggestion & Correction Mode (default OFF)
 
   const typed = useMemo(() => normalize(preset, vals), [preset, vals]);
   const syncTrace = useMemo(() => (preset.custom ? null : buildTrace((T) => preset.run(T, typed), { maxDepth: preset.maxDepth || 200 })), [preset, typed]);
@@ -149,6 +154,28 @@ export default function RecursionPage() {
   const onParam = (key, text) => setVals((v) => ({ ...v, [key]: text }));
   const onRun = () => { setCommitted({ src: draft, call: typed.call, depth: typed.depth }); setEditing(false); setRunNonce((n) => n + 1); };
 
+  /* ---- Suggestion & Correction Mode: validate the draft live while editing, the executed code (+ trace) after a run ---- */
+  const findings = useMemo(() => {
+    if (!preset.custom || !correction) return [];
+    return editing ? validateRecursion(draft).findings : validateRecursion(committed.src, { trace: customTrace }).findings;
+  }, [preset, correction, editing, draft, committed.src, customTrace]);
+  const rerunWith = (src) => { setDraft(src); setCommitted({ src, call: typed.call, depth: typed.depth }); setRunNonce((n) => n + 1); };
+  const acceptFix = (f) => {
+    const base = editing ? draft : committed.src;
+    const lines = base.split('\n'); lines[f.line - 1] = f.fix(lines[f.line - 1]);
+    const next = lines.join('\n');
+    if (editing) setDraft(next); else rerunWith(next);
+  };
+  const workspaceHost = {
+    examples: RECURSION_EXAMPLES, findings, running: busy, ran: true,
+    onRun, onAccept: (next) => setDraft(next),
+    onExample: (ex) => { setDraft(ex.code); setVals((v) => ({ ...v, call: ex.call })); },
+    summary: customTrace && !editing ? null : (
+      <p className="text-xs text-slate-500 dark:text-zinc-400">Write a recursive function, set the call expression (e.g. <code className="font-mono">sumTo(4)</code>) in the card above, then press Run. It is traced in an isolated worker with a depth limit and a time limit, so a missing base case ends in a safe, visible stack overflow.{correction && <> Suggestion mode is <b>on</b>: the validator checks the base case and whether each call moves toward it.</>}</p>
+    ),
+  };
+  const resetCustom = () => { setDraft(CUSTOM_DEFAULT); setVals((v) => ({ ...v, call: 'sumTo(4)' })); };
+
   useEffect(() => {
     const onKey = (e) => {
       const tag = (e.target.tagName || '').toLowerCase();
@@ -175,8 +202,38 @@ export default function RecursionPage() {
         <MobileTabs value={mobileTab} onChange={setMobileTab} items={[['code', 'Code Editor'], ['viz', 'Visualization']]} layout="mobtab-rec" />
         <div id="workspace" className="grid items-start gap-5 xl:grid-cols-[minmax(400px,.85fr)_minmax(0,1.5fr)]">
           <div className={`flex min-w-0 flex-col gap-5 ${mobileTab === 'code' ? '' : 'max-lg:hidden'}`}>
-            <CodePanel title={preset.custom ? 'Your code' : 'Code'} source={source} state={state} flash={flash} custom={!!preset.custom} editing={!!preset.custom && editing}
-              draft={draft} onDraft={setDraft} onToggleEdit={() => setEditing((e) => !e)} />
+            {preset.custom && editing ? (
+              <section className="card flex min-h-0 flex-col" aria-label="Your code">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Your code</h2>
+                  <button type="button" className="btn !px-3 !py-1 text-xs" onClick={() => setEditing(false)}>Preview</button>
+                </div>
+                <div className="h-[560px]">
+                  <CustomCodeWorkspace moduleId="recursion" algo={{ id: 'recursion-custom' }} code={draft} setCode={setDraft} resetToStarter={resetCustom}
+                    correction={correction} setCorrection={setCorrection} host={workspaceHost} />
+                </div>
+              </section>
+            ) : (
+              <CodePanel title={preset.custom ? 'Your code' : 'Code'} source={source} state={state} flash={flash} custom={!!preset.custom} editing={false}
+                draft={draft} onDraft={setDraft} onToggleEdit={() => setEditing((e) => !e)} />
+            )}
+            {preset.custom && !editing && (
+              <section className="card !p-3" aria-label="Logic feedback">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="eyebrow">Suggestion &amp; Correction Mode</p>
+                  <button type="button" role="switch" aria-checked={correction} onClick={() => setCorrection((c) => !c)} className="text-xs font-semibold text-slate-700 dark:text-zinc-200">
+                    <span className={`mr-2 inline-block h-4 w-8 rounded-md align-middle ${correction ? 'bg-green-600 dark:bg-green-400' : 'bg-slate-300 dark:bg-zinc-700'}`}><span className={`block h-3 w-3 translate-y-0.5 rounded-sm bg-white transition-transform ${correction ? 'translate-x-[1.1rem]' : 'translate-x-0.5'}`} /></span>{correction ? 'On' : 'Off'}
+                  </button>
+                </div>
+                {correction && (
+                  <div className="mt-2 space-y-2">
+                    {findings.length === 0 && <p className="rounded-md bg-green-50 px-3 py-2 text-xs text-green-900 dark:bg-green-950/40 dark:text-green-200">Base case and convergence checks found nothing wrong.{trace.halt ? '' : ' The trace finished normally.'}</p>}
+                    {findings.map((f, i) => <LogicFeedbackCard key={i} finding={f} code={committed.src} onAccept={acceptFix} />)}
+                    <p className="text-[11px] text-slate-500 dark:text-zinc-400">These checks look for known mistake patterns in your text plus evidence from the run. They are hints, not proofs: the call stack and tree show what really happened.</p>
+                  </div>
+                )}
+              </section>
+            )}
             <WhyPanel desc={shownDesc} stepKey={idx} prediction={prediction} feedback={feedback} error={error} />
           </div>
           <div className={`min-w-0 ${mobileTab === 'viz' ? '' : 'max-lg:hidden'}`}><Visualizer trace={trace} state={state} /></div>

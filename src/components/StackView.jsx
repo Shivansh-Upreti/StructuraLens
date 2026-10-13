@@ -1,29 +1,42 @@
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { fmt, label } from '../engine/engine.js';
 
 const STATUS = {
-  active: { cls: 'border-green-600 bg-green-50 dark:bg-green-950/50 ring-1 ring-green-200 dark:ring-green-800', tag: '▶ running', tagCls: 'text-green-700 dark:text-green-400' },
+  // The frame that is executing RIGHT NOW: emerald border, soft emerald glow and a brighter fill, so the eye lands on it first.
+  active: { cls: 'border-green-500 bg-green-100 dark:bg-green-900/50 ring-2 ring-green-500/70 shadow-[0_0_18px_-2px_rgba(16,185,129,0.65)]', tag: '▶ executing now', tagCls: 'text-green-700 dark:text-green-300 animate-pulse' },
   waiting: { cls: 'border-amber-400 bg-white dark:bg-zinc-900', tag: '⏸ paused', tagCls: 'text-amber-700 dark:text-amber-300' },
-  done: { cls: 'border-sky-500 bg-sky-50 dark:bg-sky-950/40', tag: '↩ returning', tagCls: 'text-sky-700 dark:text-sky-300' },
+  done: { cls: 'border-green-600 bg-green-50 dark:bg-green-950/40', tag: '↩ returning', tagCls: 'text-green-700 dark:text-green-400' },
   cached: { cls: 'border-violet-500 bg-violet-50 dark:bg-violet-950/40', tag: '⚡ cache hit', tagCls: 'text-violet-700 dark:text-violet-300' },
 };
 
-function Frame({ node, s, status, trace, compact }) {
+function Frame({ node, s, status, trace, compact, flowKey, fresh }) {
   const st = status === 'done' && s.cachedHit ? 'cached' : status;
   const S = STATUS[st];
   const child = s.waitChild !== null ? trace.nodes[s.waitChild] : null;
   const got = s.lastChild ? trace.nodes[s.lastChild.id] : null;
+  const ref = useRef(null);
+  const [dist, setDist] = useState(64);
+  useEffect(() => { if (ref.current) setDist(ref.current.offsetHeight + 8); });
   return (
-    <motion.div layout="position" initial={{ opacity: 0, y: -28, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -28, scale: 0.96 }}
-      transition={{ type: 'spring', stiffness: 380, damping: 30 }} className={`flex-none rounded-md border-l-[5px] border-y border-r border-y-slate-100 dark:border-y-zinc-800 border-r-slate-100 dark:border-r-zinc-800 px-3 ${compact ? 'py-1.5' : 'py-2.5'} ${S.cls}`}>
+    <motion.div ref={ref} layout="position" initial={{ opacity: 0, y: -28, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -28, scale: 0.96 }}
+      transition={{ type: 'spring', stiffness: 380, damping: 30 }} className={`relative flex-none rounded-md border-l-[5px] border-y border-r border-y-slate-100 dark:border-y-zinc-800 border-r-slate-100 dark:border-r-zinc-800 px-3 ${compact ? 'py-1.5' : 'py-2.5'} ${S.cls}`}>
+      {status === 'done' && flowKey !== null && (
+        <motion.div key={flowKey} aria-hidden="true" className="pointer-events-none absolute right-2 top-1.5 z-10 rounded-md border border-green-700 bg-green-600 px-2 py-0.5 font-mono text-xs font-bold text-white"
+          initial={{ y: 0, opacity: 1, scale: 1.3 }} animate={{ y: [0, dist, dist], opacity: [1, 1, 0], scale: [1.3, 1, 0.9] }} transition={{ duration: 1, ease: 'easeInOut', times: [0, 0.7, 1] }}>
+          ↩ {fmt(s.ret, 14)}
+        </motion.div>
+      )}
       <div className="flex items-baseline justify-between gap-2">
         <span className="break-all font-mono text-[13px] font-semibold text-slate-900 dark:text-white">{node.name}({Object.keys(node.args).map((k) => `${k}=${fmt(node.args[k], 14)}`).join(', ')})</span>
         <span className={`whitespace-nowrap text-[11px] font-semibold ${S.tagCls}`}>{S.tag}</span>
       </div>
       <div className="mt-1 text-xs text-slate-500 dark:text-zinc-400">
         {status === 'waiting' && <>Paused at <b className="text-slate-800 dark:text-zinc-100">line {s.waitLine || '?'}</b>, waiting for <code className="font-mono text-slate-800 dark:text-zinc-100">{child ? label(child) : '…'}</code>{child && child.site && <div className="mt-0.5">pending: <code className="rounded bg-amber-100 dark:bg-amber-900/40 px-1 font-mono text-amber-900 dark:text-amber-200">{child.site}</code></div>}</>}
-        {status === 'active' && <>Executing <b className="text-slate-800 dark:text-zinc-100">line {s.curLine}</b>{got && <div className="mt-0.5 text-green-700 dark:text-green-400">got <b>{fmt(s.lastChild.value)}</b> from <code className="font-mono">{label(got)}</code>{got.site && got.site !== '▢' && <> → <code className="rounded bg-green-100 dark:bg-green-900/40 px-1 font-mono">{got.site.replace('▢', fmt(s.lastChild.value))}</code></>}</div>}</>}
-        {status === 'done' && <>Returned <b className="text-base text-sky-700 dark:text-sky-300">{fmt(s.ret, 40)}</b></>}
+        {status === 'active' && <>Executing <b className="text-slate-800 dark:text-zinc-100">line {s.curLine}</b>{got && (fresh
+          ? <motion.div key={'got' + s.lastChild.id + flowKey} initial={{ backgroundColor: 'rgba(16,185,129,0.55)' }} animate={{ backgroundColor: 'rgba(16,185,129,0)' }} transition={{ duration: 1.4 }} className="mt-0.5 rounded-md px-1 py-0.5 text-green-700 dark:text-green-300">received <b className="font-mono text-sm">{fmt(s.lastChild.value)}</b> from <code className="font-mono">{label(got)}</code>{got.site && got.site !== '▢' && <> → <code className="rounded bg-green-100 px-1 font-mono dark:bg-green-900/40">{got.site.replace('▢', fmt(s.lastChild.value))}</code></>}</motion.div>
+          : <div className="mt-0.5 text-green-700 dark:text-green-400">got <b>{fmt(s.lastChild.value)}</b> from <code className="font-mono">{label(got)}</code>{got.site && got.site !== '▢' && <> → <code className="rounded bg-green-100 px-1 font-mono dark:bg-green-900/40">{got.site.replace('▢', fmt(s.lastChild.value))}</code></>}</div>)}</>}
+        {status === 'done' && <>Returned <b className="text-base text-green-700 dark:text-green-300">{fmt(s.ret, 40)}</b></>}
       </div>
       {!compact && Object.keys(s.vars).length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -56,7 +69,8 @@ export default function StackView({ trace, state }) {
             {ids.map((id) => {
               const s = st[id];
               const status = s.status === 'done' ? 'done' : id === topId ? 'active' : 'waiting';
-              return <Frame key={id} node={trace.nodes[id]} s={s} status={status} trace={trace} compact={compact && status === 'waiting'} />;
+              const fresh = !!(last && last.k === 'ret' && s.lastChild && s.lastChild.id === last.id);
+              return <Frame key={id} node={trace.nodes[id]} s={s} status={status} trace={trace} compact={compact && status === 'waiting'} fresh={fresh} flowKey={last && last.k === 'ret' && last.id === id ? 'ret' + state.lastIdx : null} />;
             })}
           </AnimatePresence>
         </div>

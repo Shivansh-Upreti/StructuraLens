@@ -3,20 +3,15 @@ import { motion } from 'framer-motion';
 import { CONTRACTS } from '../code/contracts.js';
 import { validate } from '../code/rules.js';
 import { runUserCode, MAX_CODE_CHARS } from '../code/runUserCode.js';
+import LogicFeedbackCard, { SEV } from '../../components/LogicFeedbackCard.jsx';
 
 const LH = 21;
-const SEV = {
-  major: { label: 'Incorrect logic', chip: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300', bar: 'bg-rose-500/20', dot: 'bg-rose-500' },
-  minor: { label: 'Minor mistake', chip: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300', bar: 'bg-amber-400/25', dot: 'bg-amber-400' },
-  opt: { label: 'Optimization', chip: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300', bar: 'bg-sky-400/15', dot: 'bg-sky-400' },
-};
-
 /* Plain textarea with a line-number gutter and severity bars drawn behind the text (kept in sync on scroll). */
-function Editor({ value, onChange, marks }) {
+export function Editor({ value, onChange, marks, heightClass = 'min-h-[150px] flex-1' }) {
   const [scroll, setScroll] = useState(0);
   const lines = value.split('\n');
   return (
-    <div className="relative min-h-[150px] flex-1 overflow-hidden rounded-md bg-slate-100/70 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
+    <div className={`relative ${heightClass} overflow-hidden rounded-md bg-slate-100/70 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800`}>
       <div aria-hidden="true" className="absolute inset-y-0 left-0 w-10 select-none overflow-hidden border-r border-slate-200 text-right font-mono text-[12px] text-slate-400 dark:border-zinc-800 dark:text-zinc-600">
         <div style={{ transform: `translateY(${8 - scroll}px)` }}>
           {lines.map((_, i) => <div key={i} style={{ height: LH }} className="flex items-center justify-end gap-1 pr-1.5">{marks[i + 1] && <i className={`inline-block h-1.5 w-1.5 rounded-full ${SEV[marks[i + 1]].dot}`} />}{i + 1}</div>)}
@@ -35,7 +30,7 @@ function Editor({ value, onChange, marks }) {
   );
 }
 
-function Switch({ on, onChange, children }) {
+export function Switch({ on, onChange, children }) {
   return (
     <button type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)} className="group inline-flex items-center gap-2 text-left text-xs font-semibold text-slate-700 dark:text-zinc-200">
       <span className={`relative h-5 w-9 flex-none rounded-md transition-colors ${on ? 'bg-green-600 dark:bg-green-400' : 'bg-slate-300 dark:bg-zinc-700'}`}>
@@ -46,8 +41,10 @@ function Switch({ on, onChange, children }) {
   );
 }
 
-export default function CustomCodeWorkspace({ moduleId, algo, code, setCode, resetToStarter, correction, setCorrection }) {
-  const contract = CONTRACTS[algo.id] || null;
+/* `host` (optional) replaces the test-contract flow with a host-driven one. The Recursion page uses it: Run feeds the
+   learner's code to the tracing worker and `host.summary` / `host.findings` carry the outcome. */
+export default function CustomCodeWorkspace({ moduleId, algo, code, setCode, resetToStarter, correction, setCorrection, host, editorHeightClass }) {
+  const contract = host ? null : (CONTRACTS[algo.id] || null);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
   const [report, setReport] = useState(null);   // { findings, hasRules } (only when correction mode was ON for the run)
@@ -56,13 +53,15 @@ export default function CustomCodeWorkspace({ moduleId, algo, code, setCode, res
 
   const marks = useMemo(() => {
     const m = {};
-    if (report) report.findings.forEach((f) => { const rank = { major: 3, minor: 2, opt: 1 }; if (!m[f.line] || rank[f.sev] > rank[m[f.line]]) m[f.line] = f.sev; });
+    const src = host ? { findings: host.findings || [] } : report;
+    if (src) src.findings.forEach((f) => { const rank = { major: 3, minor: 2, opt: 1 }; if (!m[f.line] || rank[f.sev] > rank[m[f.line]]) m[f.line] = f.sev; });
     return m;
-  }, [report]);
+  }, [report, host]);
 
   const onChange = (v) => { setCode(v); setStale(true); };
 
   const run = async () => {
+    if (host) { host.onRun(); return; }
     const id = ++runId.current;
     setRunning(true); setStale(false);
     const rep = correction ? validate(algo.id, code) : null;
@@ -80,10 +79,11 @@ export default function CustomCodeWorkspace({ moduleId, algo, code, setCode, res
     setReport(validate(algo.id, next));
   };
 
-  const examples = contract ? contract.examples : [];
+  const examples = host ? host.examples : (contract ? contract.examples : []);
   const passCount = result && result.tests ? result.tests.filter((t) => t.pass).length : 0;
   const slowFinding = result && result.slow ? { sev: 'opt', line: 1, msg: `Timing hint: ${result.slow.ms} ms for the speed check (${result.slow.hint}). Your version looks slower than it should be for this algorithm.` } : null;
-  const findings = report ? [...report.findings, ...(slowFinding ? [slowFinding] : [])] : [];
+  const findings = host ? (host.findings || []) : (report ? [...report.findings, ...(slowFinding ? [slowFinding] : [])] : []);
+  const isRunning = host ? !!host.running : running;
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
@@ -91,21 +91,22 @@ export default function CustomCodeWorkspace({ moduleId, algo, code, setCode, res
         <Switch on={correction} onChange={setCorrection}>Suggestion &amp; Correction Mode</Switch>
         <div className="ml-auto flex items-center gap-2">
           {examples.length > 0 && (
-            <select className="field !w-auto !py-1 text-xs" aria-label="Load an example" value="" onChange={(e) => { const ex = examples[+e.target.value]; if (ex) { setCode(ex.code); setStale(true); setResult(null); setReport(null); } }}>
+            <select className="field !w-auto !py-1 text-xs" aria-label="Load an example" value="" onChange={(e) => { const ex = examples[+e.target.value]; if (ex) { if (host) { host.onExample(ex); return; } setCode(ex.code); setStale(true); setResult(null); setReport(null); } }}>
               <option value="">Try an example…</option>
               {examples.map((x, i) => <option key={x.label} value={i}>{x.label}</option>)}
             </select>
           )}
           <button type="button" className="btn !py-1 text-xs" onClick={() => { resetToStarter(); setResult(null); setReport(null); setStale(false); }}>Reset</button>
-          <button type="button" className="btn btn-primary !py-1 text-xs" onClick={run} disabled={running}>{running ? 'Running…' : '▶ Run'}</button>
+          <button type="button" className="btn btn-primary !py-1 text-xs" onClick={run} disabled={isRunning}>{isRunning ? 'Running…' : '▶ Run'}</button>
         </div>
       </div>
 
-      <Editor value={code} onChange={onChange} marks={marks} />
+      <Editor value={code} onChange={onChange} marks={marks} heightClass={editorHeightClass} />
 
       <div className="max-h-[48%] min-h-[110px] flex-none space-y-2 overflow-auto pr-1" aria-live="polite">
-        {!result && !running && <p className="text-xs text-slate-500 dark:text-zinc-400">{contract ? <>Write <code className="font-mono">{contract.fn}(…)</code> and press Run. It is tested in an isolated worker with a 3 s limit, so infinite loops and crashes cannot freeze this page.</> : 'No automatic tests exist for this algorithm yet. Your code still runs in the isolated worker; print(…) shows output.'}{correction && <> Suggestion mode is <b>on</b>: you also get logic checks.</>}</p>}
-        {result && (
+        {host && host.summary}
+        {!host && !result && !running && <p className="text-xs text-slate-500 dark:text-zinc-400">{contract ? <>Write <code className="font-mono">{contract.fn}(…)</code> and press Run. It is tested in an isolated worker with a 3 s limit, so infinite loops and crashes cannot freeze this page.</> : 'No automatic tests exist for this algorithm yet. Your code still runs in the isolated worker; print(…) shows output.'}{correction && <> Suggestion mode is <b>on</b>: you also get logic checks.</>}</p>}
+        {!host && result && (
           <>
             <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
               <span className={`rounded-md px-3 py-1 ${result.status === 'pass' || result.status === 'ok' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'}`}>
@@ -133,30 +134,12 @@ export default function CustomCodeWorkspace({ moduleId, algo, code, setCode, res
           </>
         )}
 
-        {correction && (result || report) && (
+        {correction && (host ? host.ran : (result || report)) && (
           <div className="space-y-2 border-t border-slate-200 pt-2 dark:border-zinc-800">
             <p className="eyebrow">Suggestions</p>
             {findings.length === 0 && <p className="rounded-md bg-green-50 px-3 py-2 text-xs text-green-900 dark:bg-green-950/40 dark:text-green-200">{report && !report.hasRules ? 'No logic validator exists for this algorithm yet; only generic checks (such as endless loops) ran.' : 'No logic problems found by the pattern checks.'}{result && result.status === 'pass' ? ' Together with the passing tests, your solution looks sound.' : ''}</p>}
-            {findings.map((f, i) => {
-              const before = f.fix ? code.split('\n')[f.line - 1] : null, after = f.fix ? f.fix(before) : null;
-              return (
-                <div key={i} className="rounded-md bg-white p-2.5 text-xs ring-1 ring-slate-200 dark:bg-zinc-900 dark:ring-zinc-700">
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <span className={`rounded-md px-2 py-px font-bold ${SEV[f.sev].chip}`}>{SEV[f.sev].label}</span>
-                    <span className="font-mono text-slate-500 dark:text-zinc-400">line {f.line}</span>
-                  </div>
-                  <p className="leading-relaxed text-slate-700 dark:text-zinc-200">{f.msg}</p>
-                  {f.fix && before !== after && (
-                    <div className="mt-1.5">
-                      <pre className="overflow-auto rounded-md bg-rose-50 px-2 py-1 font-mono text-[11px] text-rose-900 dark:bg-rose-950/30 dark:text-rose-200">- {before.trim()}</pre>
-                      <pre className="mt-0.5 overflow-auto rounded-md bg-green-50 px-2 py-1 font-mono text-[11px] text-green-900 dark:bg-green-950/40 dark:text-green-200">+ {after.trim()}</pre>
-                      <button type="button" className="btn btn-primary mt-1.5 !px-3 !py-1 text-xs" onClick={() => accept(f)}>Accept suggestion</button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-            <p className="text-[11px] text-slate-500 dark:text-zinc-400">These checks look for known mistake patterns in your text. They are hints, not proofs: the tests above decide whether your code is correct.</p>
+            {findings.map((f, i) => <LogicFeedbackCard key={i} finding={f} code={code} onAccept={accept} />)}
+            <p className="text-[11px] text-slate-500 dark:text-zinc-400">These checks look for known mistake patterns in your text. They are hints, not proofs: the {host ? 'trace and call stack' : 'tests above'} decide whether your code is correct.</p>
           </div>
         )}
       </div>

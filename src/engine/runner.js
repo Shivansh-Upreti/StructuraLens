@@ -22,10 +22,13 @@ function validate(tr, limits) {
   });
   layoutTree(nodes);
   const halt = ['depth', 'events', 'time'].includes(tr.halt) ? tr.halt : null;
-  return { events, nodes, halt, error: typeof tr.error === 'string' ? tr.error.slice(0, 300) : null, result: tr.result, maxDepth: limits.maxDepth, overflow: halt === 'depth', truncated: halt === 'events', timedOut: halt === 'time', names: Array.isArray(tr.names) ? tr.names.filter((s) => typeof s === 'string').slice(0, 20) : [] };
+  return { events, nodes, halt, error: typeof tr.error === 'string' ? tr.error.slice(0, 300) : null, result: tr.result, maxDepth: limits.maxDepth, overflow: halt === 'depth', truncated: halt === 'events', timedOut: halt === 'time', names: Array.isArray(tr.names) ? tr.names.filter((s) => typeof s === 'string').slice(0, 20) : [],
+    entry: typeof tr.entry === 'string' ? tr.entry.slice(0, MAX_CALL_CHARS) : null, fromMain: tr.fromMain === true,
+    js: typeof tr.js === 'string' ? tr.js.slice(0, MAX_CODE_CHARS * 3) : null };
 }
 
-export function runCustomSandboxed(code, call, limits) {
+/** lang: 'javascript' (default) | 'cpp' | 'c' | 'java' | 'python'. Translation happens inside the worker. */
+export function runCustomSandboxed(code, call, limits, lang = 'javascript') {
   const lim = { ...DEFAULT_LIMITS, ...limits };
   if (code.length > MAX_CODE_CHARS) return Promise.resolve(emptyTrace('Code is longer than ' + MAX_CODE_CHARS + ' characters.', null, lim.maxDepth));
   if (call.length > MAX_CALL_CHARS) return Promise.resolve(emptyTrace('Call expression is too long.', null, lim.maxDepth));
@@ -43,6 +46,6 @@ export function runCustomSandboxed(code, call, limits) {
       } catch (err) { done(emptyTrace('Rejected an invalid result from the sandbox.', null, lim.maxDepth)); }
     };
     worker.onerror = (e) => { e.preventDefault && e.preventDefault(); done(emptyTrace('The sandbox crashed while running your code.', null, lim.maxDepth)); };
-    worker.postMessage({ code, call, limits: lim });
+    worker.postMessage({ code, call, limits: lim, lang });
   });
 }

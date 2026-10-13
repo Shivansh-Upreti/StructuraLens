@@ -2,26 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Palette lives in tailwind.config.js (canvas #0A0A0A, panels #121212/#171717,
+   border #27272A, accent #22D3EE, error #EF4444). No gradients, shadows, blur
+   or rounded pills anywhere. */
 @layer base {
   html { color-scheme: light; }
   html.dark { color-scheme: dark; }
-  /* Flat page surface: pure black in dark mode, no decorative glows or gradients. */
-  body { @apply bg-slate-50 font-sans text-slate-800 antialiased dark:bg-black dark:text-zinc-200; transition: background-color .2s, color .2s; }
-  :focus-visible { @apply outline-2 outline-offset-2 outline-green-600 dark:outline-green-400; }
+  body { @apply bg-slate-50 font-sans text-slate-800 antialiased dark:bg-canvas dark:text-fg; }
+  :focus-visible { @apply outline outline-1 outline-offset-2 outline-accent-600 dark:outline-accent; }
+  ::selection { @apply bg-accent/30 text-inherit; }
 }
+
 @layer components {
-  /* Cards: flat surface + 1px solid border, no shadow. */
-  .card { @apply rounded-lg border border-slate-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950; }
-  /* Buttons: flat, bordered, subtle hover. */
-  .btn { @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-100 active:translate-y-px disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white;
-    @apply dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:disabled:hover:bg-zinc-950; }
-  /* Primary: solid, high contrast (white on near-black in dark mode, near-black on white in light mode). No gradients, no glow. */
-  .btn-primary { @apply border-transparent bg-slate-900 text-white hover:bg-slate-700 disabled:hover:bg-slate-900;
-    @apply dark:border-transparent dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-300 dark:disabled:hover:bg-white; }
-  /* Tags / badges / metrics: square-ish and monospaced. */
-  .pill { @apply inline-flex items-center gap-1.5 rounded-md px-3 py-1 font-mono text-xs font-semibold ring-1 ring-inset; }
-  .field { @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 dark:placeholder:text-zinc-500; }
-  .eyebrow { @apply text-[11px] font-bold uppercase tracking-[.14em] text-slate-500 dark:text-zinc-400; }
-  .bg-dots { background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 18px 18px; }
-  .dark .bg-dots { background-image: radial-gradient(#3f3f46 1px, transparent 1px); }
+  /* Panel: flat tone + 1px border. */
+  .card { @apply rounded-sm border border-slate-200 bg-white p-5 dark:border-line dark:bg-panel; }
+
+  /* Buttons: rectangular, 1px border, colour change on hover only (no lift, no scale). */
+  .btn { @apply inline-flex items-center justify-center gap-1.5 rounded-sm border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-800 transition-colors duration-100 hover:border-accent-600 hover:text-accent-700 disabled:cursor-default disabled:opacity-40 disabled:hover:border-slate-300 disabled:hover:text-slate-800;
+    @apply dark:border-line dark:bg-panel dark:text-fg dark:hover:border-accent dark:hover:text-accent dark:disabled:hover:border-line dark:disabled:hover:text-fg; }
+  /* Primary: solid accent, near-black label. */
+  .btn-primary { @apply border-accent-600 bg-accent-600 text-white hover:border-accent-700 hover:bg-accent-700 hover:text-white disabled:hover:bg-accent-600;
+    @apply dark:border-accent dark:bg-accent dark:text-canvas dark:hover:border-accent-300 dark:hover:bg-accent-300 dark:hover:text-canvas dark:disabled:hover:bg-accent; }
+
+  /* Metrics / tags: monospaced, square. */
+  .pill { @apply inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 font-mono text-xs font-semibold ring-1 ring-inset; }
+  .field { @apply w-full rounded-sm border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-accent-600 focus:outline-none dark:border-line dark:bg-canvas dark:text-fg dark:placeholder:text-fg-muted dark:focus:border-accent; }
+  .eyebrow { @apply font-mono text-[11px] font-semibold uppercase tracking-[.12em] text-slate-500 dark:text-fg-muted; }
+
+  /* Terminal-style prefix used instead of icons/emoji: ">_ Label". */
+  .prompt::before { content: '>_'; @apply mr-2 font-mono font-semibold text-accent-600 dark:text-accent; }
+
+  /* Completed state (frames, nodes, rows): #27272A border, #A1A1AA text. */
+  .is-done { @apply border-zinc-300 text-zinc-500 dark:border-line dark:text-fg-done; }
+
+  /* Skeleton loader: flat block that breathes; shown while async work runs. */
+  .skeleton { @apply animate-skeleton rounded-sm bg-slate-200 dark:bg-panel-2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
 }

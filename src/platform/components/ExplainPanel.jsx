@@ -21,7 +21,7 @@ export function ModeToggle({ mode, onMode }) {
       {MODES.map(([id, text]) => (
         <button key={id} type="button" role="radio" aria-checked={mode === id} onClick={() => onMode(id)} title={id === 'beginner' ? 'Analogies and plain language' : 'Complexity, proofs and trade-offs'}
           className={`relative rounded-md px-3 py-1 text-xs font-semibold transition-colors ${mode === id ? 'text-green-700 dark:text-green-300' : 'text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100'}`}>
-          {mode === id && <motion.span layoutId="explain-pill" className="absolute inset-0 rounded-md bg-white dark:bg-zinc-950" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
+          {mode === id && <motion.span layoutId="explain-pill" className="absolute inset-0 rounded-md bg-white dark:bg-zinc-950" transition={{ duration: 0.18, ease: 'easeOut' }} />}
           <span className="relative">{text}</span>
         </button>
       ))}
@@ -54,7 +54,7 @@ export default function ExplainPanel({ moduleId, algo, kind, mode, placeholderLi
           <p className="text-[15px]">{ex.a.summary}</p>
           <ul className="list-disc space-y-2 pl-5 marker:text-green-700 dark:marker:text-green-400">{ex.a.points.map((s) => <li key={s}>{s}</li>)}</ul>
           <div className="flex flex-wrap gap-2">
-            {[['Time', algo.complexity.time], ['Space', algo.complexity.space]].map(([k, v]) => <span key={k} className="rounded-md bg-slate-100 px-3 py-1.5 text-xs dark:bg-zinc-800 font-mono"><b className="mr-1 text-slate-900 dark:text-white">{k}</b>{v}</span>)}
+            {[['Time', algo.complexity.time], ['Space', algo.complexity.space]].map(([k, v]) => <span key={k} className="rounded-md bg-slate-100 px-3 py-1.5 text-xs dark:bg-zinc-800 font-mono"><b className="mr-1 text-slate-900 dark:text-fg">{k}</b>{v}</span>)}
           </div>
         </>
       )}

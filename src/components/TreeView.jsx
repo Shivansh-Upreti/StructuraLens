@@ -3,14 +3,16 @@ import { motion } from 'framer-motion';
 import { fmt, label } from '../engine/engine.js';
 
 /* Node colour = where the call is in its life:
-   grey    -> waiting: paused until its children return
-   violet  -> executing right now
-   emerald -> finished and returned (dashed when answered from the cache) */
+   neutral -> waiting: paused until its children return
+   cyan    -> executing right now (the only accent node)
+   #27272A border + #A1A1AA text -> completed (dashed when answered from the cache)
+   red     -> the call that hit the depth limit */
 const NODE = {
-  active: { rect: 'fill-violet-100 dark:fill-violet-950 stroke-violet-500 dark:stroke-violet-400', val: 'fill-violet-700 dark:fill-violet-300', lab: 'fill-slate-900 dark:fill-white', sw: 2.75 },
-  waiting: { rect: 'fill-slate-100 dark:fill-zinc-900 stroke-slate-400 dark:stroke-zinc-600', val: 'fill-slate-500 dark:fill-zinc-400', lab: 'fill-slate-500 dark:fill-zinc-400', sw: 1.5 },
-  done: { rect: 'fill-green-50 dark:fill-green-950 stroke-green-600 dark:stroke-green-500', val: 'fill-green-700 dark:fill-green-400', lab: 'fill-slate-800 dark:fill-zinc-100', sw: 1.75 },
-  cached: { rect: 'fill-green-50 dark:fill-green-950 stroke-green-600 dark:stroke-green-500', val: 'fill-green-700 dark:fill-green-400', lab: 'fill-slate-800 dark:fill-zinc-100', sw: 1.75 },
+  active: { rect: 'fill-accent-50 stroke-accent-600 dark:fill-accent-950 dark:stroke-accent', val: 'fill-accent-700 dark:fill-accent', lab: 'fill-slate-900 dark:fill-fg', sw: 2 },
+  waiting: { rect: 'fill-white stroke-slate-400 dark:fill-panel-2 dark:stroke-zinc-600', val: 'fill-slate-500 dark:fill-fg-muted', lab: 'fill-slate-700 dark:fill-fg', sw: 1 },
+  done: { rect: 'fill-white stroke-slate-300 dark:fill-panel dark:stroke-line', val: 'fill-slate-500 dark:fill-fg-done', lab: 'fill-slate-500 dark:fill-fg-done', sw: 1 },
+  cached: { rect: 'fill-white stroke-slate-300 dark:fill-panel dark:stroke-zinc-600', val: 'fill-slate-500 dark:fill-fg-done', lab: 'fill-slate-500 dark:fill-fg-done', sw: 1 },
+  error: { rect: 'fill-red-50 stroke-red-500 dark:fill-red-950 dark:stroke-red-500', val: 'fill-red-600 dark:fill-red-500', lab: 'fill-slate-900 dark:fill-fg', sw: 2 },
 };
 
 export default function TreeView({ trace, state }) {
@@ -80,27 +82,27 @@ export default function TreeView({ trace, state }) {
         <span>drag to pan · wheel to zoom</span>
         <button type="button" className="btn !px-2.5 !py-1 text-xs" onClick={fit}>Fit &amp; follow</button>
       </div>
-      <div ref={host} className="relative min-h-[300px] flex-1 cursor-grab touch-none overflow-hidden rounded-md bg-dots bg-slate-50 dark:bg-zinc-950 ring-1 ring-slate-100 dark:ring-zinc-800 active:cursor-grabbing"
+      <div ref={host} className="relative min-h-[300px] flex-1 cursor-grab touch-none overflow-hidden rounded-md bg-slate-50 ring-1 ring-slate-200 dark:bg-canvas dark:ring-line active:cursor-grabbing"
         onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
         <svg className="h-full w-full" role="img" aria-label="Recursion tree">
-          <motion.g style={{ originX: 0, originY: 0 }} animate={{ x: view.x, y: view.y, scale: view.k }} transition={dragging ? { duration: 0 } : { type: 'spring', stiffness: 170, damping: 26 }}>
+          <motion.g style={{ originX: 0, originY: 0 }} animate={{ x: view.x, y: view.y, scale: view.k }} transition={dragging ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}>
             {geo.edges.map((e) => {
               const s = state.st[e.id], shown = s.status !== 'pending';
               const bubble = last && last.k === 'ret' && last.id === e.id;
               const top = state.stack[state.stack.length - 1] === e.id;
-              const cls = bubble ? 'stroke-green-600 dark:stroke-green-500' : top ? 'stroke-violet-500 dark:stroke-violet-400' : onStack.has(e.id) ? 'stroke-slate-400 dark:stroke-zinc-500' : s.status === 'done' ? 'stroke-green-600/40 dark:stroke-green-500/40' : 'stroke-slate-300 dark:stroke-zinc-600';
-              return <motion.path key={e.id} d={e.d} fill="none" className={cls} initial={false} animate={{ pathLength: shown ? 1 : 0, opacity: shown ? 1 : 0, strokeWidth: bubble ? 4 : 2 }} transition={{ duration: 0.35 }} />;
+              const cls = bubble || top ? 'stroke-accent-600 dark:stroke-accent' : onStack.has(e.id) ? 'stroke-slate-400 dark:stroke-zinc-500' : 'stroke-slate-300 dark:stroke-line';
+              return <motion.path key={e.id} d={e.d} fill="none" className={cls} initial={false} animate={{ pathLength: shown ? 1 : 0, opacity: shown ? 1 : 0, strokeWidth: bubble ? 2.5 : 1.5 }} transition={{ duration: 0.35 }} />;
             })}
             {trace.nodes.map((n) => {
               const s = state.st[n.id], pending = s.status === 'pending';
-              const key = s.status === 'done' ? (n.cached ? 'cached' : 'done') : s.status === 'waiting' ? 'waiting' : 'active';
+              const key = s.status === 'done' ? (n.cached ? 'cached' : 'done') : s.status === 'waiting' ? 'waiting' : state.overflow && n.id === trace.nodes.length - 1 ? 'error' : 'active';
               const S = NODE[key];
-              const val = s.status === 'done' ? '→ ' + fmt(s.ret, 12) : s.status === 'waiting' ? '⏸ waiting' : s.status === 'active' ? '▶ running' : '';
+              const val = s.status === 'done' ? '→ ' + fmt(s.ret, 12) : s.status === 'waiting' ? 'waiting' : s.status === 'active' ? 'running' : '';
               return (
                 <g key={n.id} transform={`translate(${geo.px(n) - geo.w / 2},${geo.py(n) - geo.h / 2})`} style={{ pointerEvents: pending ? 'none' : 'auto' }}>
-                  <motion.g initial={false} animate={{ opacity: pending ? 0 : 1, scale: pending ? 0.6 : 1 }} transition={{ type: 'spring', stiffness: 360, damping: 26 }} style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+                  <motion.g initial={false} animate={{ opacity: pending ? 0 : 1 }} transition={{ duration: 0.18, ease: 'easeOut' }} style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
                     <title>{label(n)}</title>
-                    <rect width={geo.w} height={geo.h} rx={10} strokeWidth={S.sw} strokeDasharray={key === 'cached' ? '4 3' : undefined} className={`${S.rect} transition-colors`} />
+                    <rect width={geo.w} height={geo.h} rx={2} strokeWidth={S.sw} strokeDasharray={key === 'cached' ? '4 3' : undefined} className={`${S.rect} transition-colors`} />
                     <text x={geo.w / 2} y={17} textAnchor="middle" className={`${S.lab} font-mono text-[12px] font-semibold`}>{label(n)}</text>
                     <text x={geo.w / 2} y={33} textAnchor="middle" className={`${S.val} font-mono text-[11px] font-bold`}>{val}</text>
                   </motion.g>
@@ -110,11 +112,11 @@ export default function TreeView({ trace, state }) {
             {last && last.k === 'ret' && trace.nodes[last.id].parent !== null && (() => {
               const n = trace.nodes[last.id], p = trace.nodes[n.parent];
               return (
-                <motion.g key={'fly' + state.lastIdx} pointerEvents="none" initial={{ x: geo.px(n), y: geo.py(n), opacity: 1, scale: 1.25 }}
-                  animate={{ x: geo.px(p), y: geo.py(p) + geo.h / 2 - 2, opacity: [1, 1, 0], scale: [1.25, 1, 0.9] }}
-                  transition={{ duration: 1, ease: 'easeInOut', opacity: { duration: 1, times: [0, 0.75, 1] }, scale: { duration: 1, times: [0, 0.5, 1] } }}>
-                  <rect x={-24} y={-11} width={48} height={22} rx={5} className="fill-green-600 stroke-green-800 dark:stroke-green-300" strokeWidth={1} />
-                  <text textAnchor="middle" y={4.5} className="fill-white font-mono text-[12px] font-bold">↩ {fmt(last.value, 7)}</text>
+                <motion.g key={'fly' + state.lastIdx} pointerEvents="none" initial={{ x: geo.px(n), y: geo.py(n), opacity: 1 }}
+                  animate={{ x: geo.px(p), y: geo.py(p) + geo.h / 2 - 2, opacity: [1, 1, 0] }}
+                  transition={{ duration: 1, ease: 'easeInOut', opacity: { duration: 1, times: [0, 0.75, 1] } }}>
+                  <rect x={-24} y={-11} width={48} height={22} rx={2} className="fill-accent-600 stroke-accent-700 dark:fill-accent dark:stroke-accent" strokeWidth={1} />
+                  <text textAnchor="middle" y={4.5} className="fill-white font-mono text-[12px] font-bold dark:fill-canvas">{fmt(last.value, 7)}</text>
                 </motion.g>
               );
             })()}
@@ -122,7 +124,7 @@ export default function TreeView({ trace, state }) {
         </svg>
       </div>
       <div className="mt-2 flex flex-wrap gap-4 text-[11px] text-slate-500 dark:text-zinc-400">
-        {[['bg-violet-500', 'executing'], ['bg-slate-400', 'waiting for children'], ['bg-green-600', 'returned'], ['border-2 border-dashed border-green-600', 'answered from cache']].map(([c, t]) => <span key={t}><i className={`mr-1.5 inline-block h-2.5 w-2.5 rounded-full ${c}`} />{t}</span>)}
+        {[['border-accent-600 bg-accent-600 dark:border-accent dark:bg-accent', 'executing'], ['border-slate-400 dark:border-zinc-600', 'waiting for children'], ['border-slate-300 dark:border-line dark:bg-panel', 'returned'], ['border-dashed border-slate-400 dark:border-zinc-600', 'answered from cache'], ['border-red-500', 'depth limit hit']].map(([c, t]) => <span key={t} className="font-mono"><i className={`mr-1.5 inline-block h-2.5 w-2.5 border ${c}`} />{t}</span>)}
       </div>
     </div>
   );

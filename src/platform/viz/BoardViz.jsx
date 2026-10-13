@@ -23,11 +23,11 @@ export default function BoardViz({ frame }) {
                 {isTry && <motion.div key={kind + r + c} initial={{ opacity: 0.2 }} animate={{ opacity: 1, x: kind === 'conflict' ? [0, -4, 4, -3, 0] : 0 }} transition={{ duration: 0.35 }} className={`absolute inset-1 rounded-md ring-4 ${KIND_RING[kind] || 'ring-amber-500'}`} />}
                 <AnimatePresence>
                   {queens[r] === c && (
-                    <motion.span key="q" initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0, opacity: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                      className={`select-none text-[clamp(20px,6vw,40px)] leading-none ${attacker && attacker.r === r && attacker.c === c ? 'text-rose-600 dark:text-rose-400' : solved ? 'text-green-700 dark:text-green-400' : 'text-slate-900 dark:text-white'}`}>♛</motion.span>
+                    <motion.span key="q" initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className={`select-none text-[clamp(20px,6vw,40px)] leading-none ${attacker && attacker.r === r && attacker.c === c ? 'text-rose-600 dark:text-rose-400' : solved ? 'text-green-700 dark:text-green-400' : 'text-slate-900 dark:text-fg'}`}>♛</motion.span>
                   )}
                 </AnimatePresence>
-                {isTry && queens[r] !== c && kind === 'conflict' && <span className="absolute text-2xl font-bold text-rose-600 dark:text-rose-400">✕</span>}
+                {isTry && queens[r] !== c && kind === 'conflict' && <span className="absolute text-2xl font-bold text-rose-600 dark:text-rose-400">×</span>}
               </div>
             );
           })}

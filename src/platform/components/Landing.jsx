@@ -1,86 +1,70 @@
-import { motion } from 'framer-motion';
 import { TIERS } from '../topics.js';
 import { href } from '../router.js';
 
-const reveal = { hidden: { opacity: 0, y: 16, filter: 'blur(6px)' }, show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } };
-const stagger = (s = 0.07, d = 0) => ({ hidden: {}, show: { transition: { staggerChildren: s, delayChildren: d } } });
-const card = { hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } } };
+/* Landing = an index, not a brochure. Left: what the tool is, in two sentences.
+   Right: the full curriculum as a dense, scannable table (one row per topic). */
+const TOTAL = TIERS.reduce((n, t) => n + t.topics.length, 0);
 
-function Words({ text, className, wordClass = '' }) {
-  return (
-    <motion.span variants={stagger(0.06, 0.25)} initial="hidden" animate="show" className={className} aria-label={text}>
-      {text.split(' ').map((w, i) => <motion.span key={i} variants={reveal} className={`mr-[0.28em] inline-block ${wordClass}`} aria-hidden="true">{w}</motion.span>)}
-    </motion.span>
-  );
-}
-
-const STEPS = [
-  ['Watch', 'Code and animation move in lock-step, line by line, so you always see which instruction caused which change.'],
-  ['Explain', 'Switch between Beginner and Advanced explanations at any time: real-world analogies, or complexity and proofs.'],
-  ['Compare', 'Switch algorithms on the same input to see why one wins: swaps, comparisons and memory, side by side.'],
+const NOTES = [
+  ['Trace', 'Every step records the exact source line, the variables and the data-structure state that line produced.'],
+  ['Explain', 'Beginner and Advanced explanations per step: an analogy, or the invariant, proof sketch and cost.'],
+  ['Verify', 'Trace your own recursive function in JavaScript, C, C++, Java or Python, or test your implementation of any other algorithm in a sandboxed worker.'],
 ];
 
-function TopicCard({ t, advanced }) {
-  const live = t.status === 'live';
+function TopicRow({ t, n }) {
   return (
-    <motion.a variants={card} whileHover={{ y: -2 }} href={href(t.id)}
-      className="group relative flex h-full flex-col rounded-lg border border-slate-200 bg-white p-5 transition-colors hover:border-slate-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600">
-      <div className="mb-3 flex items-center gap-2">
-        <span className={`rounded-md px-2 py-px text-[10px] font-bold uppercase tracking-wider ${live ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>{live ? 'Interactive' : 'Preview'}</span>
-        {advanced && <span className="rounded-md bg-amber-100 px-2 py-px text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-mono">Advanced</span>}
-      </div>
-      <h3 className=" text-xl font-semibold text-slate-900 dark:text-white">{t.title}</h3>
-      <p className="mt-1.5 flex-1 text-sm text-slate-600 dark:text-zinc-400">{t.hard}</p>
-      <p className="mt-3 text-xs font-medium text-green-700 dark:text-green-400">{t.tag}</p>
-      <span aria-hidden="true" className="absolute right-4 top-4 text-slate-300 transition group-hover:translate-x-1 group-hover:text-green-600 dark:text-zinc-600 dark:group-hover:text-green-400">→</span>
-    </motion.a>
+    <li>
+      <a href={href(t.id)} className="group grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-3 border-b border-slate-200 px-3 py-3 transition-colors duration-100 hover:bg-slate-100 dark:border-line dark:hover:bg-panel-2 sm:grid-cols-[2.25rem_minmax(0,12rem)_minmax(0,1fr)] sm:items-baseline">
+        <span className="font-mono text-xs text-slate-400 dark:text-fg-muted">{String(n).padStart(2, '0')}</span>
+        <span className="font-medium text-slate-900 group-hover:text-accent-700 dark:text-fg dark:group-hover:text-accent">{t.title}</span>
+        <span className="col-start-2 mt-0.5 min-w-0 sm:col-start-3 sm:row-start-1 sm:mt-0">
+          <span className="block text-sm text-slate-500 dark:text-fg-muted">{t.hard}</span>
+          <span className="mt-1 block font-mono text-[11px] text-slate-500 dark:text-fg-done">{t.tag}</span>
+        </span>
+      </a>
+    </li>
   );
 }
 
 export default function Landing() {
+  let n = 0;
   return (
-    <div>
-      <section className="relative mx-auto max-w-[1200px] px-6 pb-12 pt-10 sm:px-5 sm:pt-24">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] opacity-60 [mask-image:radial-gradient(60%_70%_at_50%_0%,black,transparent)]"
-          style={{ backgroundImage: 'linear-gradient(to right, rgba(120,116,100,.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(120,116,100,.18) 1px, transparent 1px)', backgroundSize: '44px 44px' }} />
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="eyebrow text-green-700 dark:text-green-400">DS &amp; DAA Visual Learning Platform</motion.p>
-        <h1 className="mt-3 text-[clamp(2.1rem,10.5vw,5.5rem)] font-semibold leading-[1.05] tracking-tight text-slate-900 dark:text-white lg:text-8xl">
-          <Words text="StructuraLens" wordClass="" />
+    <div className="mx-auto grid max-w-[1280px] gap-10 px-5 py-10 sm:px-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-14 lg:py-16">
+      <aside className="lg:sticky lg:top-24 lg:self-start">
+        <p className="eyebrow prompt">structuralens</p>
+        <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-slate-900 dark:text-fg sm:text-4xl">
+          Step-through visualizer for data structures and algorithms.
         </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed sm:mt-5 sm:text-xl sm:leading-relaxed text-slate-600 dark:text-zinc-300">
-          <Words text="See the structure inside every algorithm. From Big-O to A* search, one calm place to learn it." />
+        <p className="mt-4 text-[15px] leading-relaxed text-slate-600 dark:text-fg-muted">
+          Code and state advance together, one line at a time. Pick a topic, press play, and step backwards whenever something is unclear.
         </p>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.5 }} className="mt-8 flex flex-wrap gap-3">
-          <a href={href('recursion')} className="btn btn-primary !rounded-md !px-5 !py-2.5 text-sm sm:!px-6 sm:!py-3 sm:text-base">Start with Recursion →</a>
-          <a href="#topics" onClick={(e) => { e.preventDefault(); document.getElementById('topics')?.scrollIntoView({ behavior: 'smooth' }); }} className="btn !rounded-md !px-5 !py-2.5 text-sm sm:!px-6 sm:!py-3 sm:text-base">Browse the curriculum</a>
-        </motion.div>
-      </section>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <a href={href('recursion')} className="btn btn-primary">Open Recursion</a>
+          <a href="#topics" onClick={(e) => { e.preventDefault(); document.getElementById('topics')?.scrollIntoView(); }} className="btn">Curriculum ({TOTAL})</a>
+        </div>
+        <dl className="mt-10 divide-y divide-slate-200 border-y border-slate-200 dark:divide-line dark:border-line">
+          {NOTES.map(([k, v]) => (
+            <div key={k} className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 py-3 text-sm">
+              <dt className="font-mono text-xs uppercase tracking-wider text-slate-500 dark:text-fg-muted">{k}</dt>
+              <dd className="text-slate-600 dark:text-fg-done">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </aside>
 
-      <section id="topics" className="mx-auto max-w-[1200px] scroll-mt-20 space-y-10 px-6 py-6 sm:space-y-12 sm:px-5 sm:py-8">
+      <section id="topics" className="min-w-0 scroll-mt-20">
         {TIERS.map((tier) => (
-          <div key={tier.id}>
-            <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.45 }} className="mb-5">
-              <p className="eyebrow flex items-center gap-2 text-green-700 dark:text-green-400">{tier.kicker}{tier.advanced && <span className="rounded-md bg-amber-100 px-2 py-px text-[10px] font-bold tracking-wider text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-mono">ADVANCED</span>}</p>
-              <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white sm:text-3xl">{tier.title}</h2>
-              <p className="mt-1 max-w-2xl text-slate-600 dark:text-zinc-400">{tier.blurb}</p>
-            </motion.div>
-            <motion.div variants={stagger(0.06)} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {tier.topics.map((t) => <TopicCard key={t.id} t={t} advanced={tier.advanced} />)}
-            </motion.div>
+          <div key={tier.id} className="mb-10 last:mb-0">
+            <header className="flex items-baseline justify-between gap-4 border-b border-slate-300 pb-2 dark:border-zinc-700">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-fg">
+                <span className="mr-2 font-mono text-xs font-normal text-slate-400 dark:text-fg-muted">{tier.kicker}</span>{tier.title}
+              </h2>
+              <span className="font-mono text-[11px] text-slate-400 dark:text-fg-muted">{tier.topics.length} topics{tier.advanced ? ' / advanced' : ''}</span>
+            </header>
+            <p className="mt-2 mb-1 text-sm text-slate-500 dark:text-fg-muted">{tier.blurb}</p>
+            <ul>{tier.topics.map((t) => <TopicRow key={t.id} t={t} n={++n} />)}</ul>
           </div>
         ))}
-      </section>
-
-      <section className="mx-auto max-w-[1200px] px-6 py-10 sm:px-5 sm:py-12">
-        <motion.div variants={stagger(0.12)} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} className="grid gap-8 sm:grid-cols-3">
-          {STEPS.map(([t, d], i) => (
-            <motion.div key={t} variants={reveal}>
-              <p className=" text-4xl font-semibold text-green-700/40 dark:text-green-400/40">0{i + 1}</p>
-              <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">{t}</h3>
-              <p className="mt-1 text-slate-600 dark:text-zinc-400">{d}</p>
-            </motion.div>
-          ))}
-        </motion.div>
       </section>
     </div>
   );

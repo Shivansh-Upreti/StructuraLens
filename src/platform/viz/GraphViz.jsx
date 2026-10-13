@@ -5,9 +5,9 @@ const NODE = {
   unseen: 'fill-white stroke-slate-400 dark:fill-zinc-900 dark:stroke-zinc-600',
   frontier: 'fill-amber-100 stroke-amber-500 dark:fill-amber-900/50 dark:stroke-amber-400',
   current: 'fill-green-600 stroke-green-800 dark:fill-green-500 dark:stroke-green-300',
-  visited: 'fill-sky-100 stroke-sky-600 dark:fill-sky-900/50 dark:stroke-sky-400',
+  visited: 'fill-slate-100 stroke-slate-400 dark:fill-panel dark:stroke-line',
 };
-const TXT = { current: 'fill-white', unseen: 'fill-slate-700 dark:fill-zinc-200', frontier: 'fill-slate-900 dark:fill-amber-100', visited: 'fill-slate-900 dark:fill-sky-100' };
+const TXT = { current: 'fill-white dark:fill-canvas', unseen: 'fill-slate-700 dark:fill-zinc-200', frontier: 'fill-slate-900 dark:fill-amber-100', visited: 'fill-slate-500 dark:fill-fg-done' };
 const same = (e, p) => p && ((e[0] === p[0] && e[1] === p[1]) || (e[0] === p[1] && e[1] === p[0]));
 
 export default function GraphViz({ frame }) {
@@ -56,10 +56,10 @@ export default function GraphViz({ frame }) {
         )}
         <div>
           <p className="eyebrow mb-1.5">Visit order</p>
-          <p className="min-h-[24px] font-mono text-sm text-slate-800 dark:text-zinc-100">{order.length ? order.join(' → ') : '—'}</p>
+          <p className="min-h-[24px] font-mono text-sm text-slate-800 dark:text-fg">{order.length ? order.join(' → ') : '—'}</p>
         </div>
         <div className="space-y-1 text-xs text-slate-500 dark:text-zinc-400">
-          {[['bg-white border border-slate-400', 'unseen'], ['bg-amber-300', 'discovered (in structure)'], ['bg-green-600', 'being visited'], ['bg-sky-300', 'finished']].map(([c, t]) => <p key={t}><i className={`mr-1.5 inline-block h-2.5 w-2.5 rounded-full ${c}`} />{t}</p>)}
+          {[['bg-white border border-slate-400', 'unseen'], ['bg-amber-300', 'discovered (in structure)'], ['bg-green-600', 'being visited'], ['border border-slate-400 bg-slate-100 dark:border-line dark:bg-panel', 'finished']].map(([c, t]) => <p key={t}><i className={`mr-1.5 inline-block h-2.5 w-2.5 rounded-full ${c}`} />{t}</p>)}
         </div>
       </div>
     </div>

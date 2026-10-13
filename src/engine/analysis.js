@@ -59,7 +59,7 @@ export function analyze(trace, lines, meta) {
     else badges.push({ label: 'Tree recursion (' + maxBranch + ' branches)', tone: 'info', hint: 'Calls spawn several calls. The call tree branches, but the stack only ever holds one root→leaf path.' });
     if (meta && meta.flavor && meta.flavor !== 'User code' && !badges.some((b) => b.label === meta.flavor)) badges.push({ label: meta.flavor, tone: 'accent', hint: 'Design pattern this example illustrates.' });
     if (sites.length) badges.push(tailAll
-      ? { label: 'Tail position ✓', tone: 'good', hint: 'Every recursive call is the last thing its function does (nothing is left to combine). Compilers could reuse the frame, but most JavaScript engines do not (only Safari implements proper tail calls).' }
+      ? { label: 'Tail position', tone: 'good', hint: 'Every recursive call is the last thing its function does (nothing is left to combine). Compilers could reuse the frame, but most JavaScript engines do not (only Safari implements proper tail calls).' }
       : { label: 'Not tail-recursive', tone: 'muted', hint: 'Some recursive call is followed by more work (e.g. a multiplication or addition), so the frame must stay on the stack to finish it.' });
     if (cached) badges.push({ label: 'Memoized', tone: 'good', hint: cached + ' call(s) were answered from the cache without recursing.' });
 

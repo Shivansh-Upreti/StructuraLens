@@ -16,12 +16,12 @@ export default function GridViz({ frame }) {
             const isCur = cur && cur[0] === r && cur[1] === c;
             let cls = 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800';
             if (wallSet.has(kk)) cls = 'bg-slate-700 dark:bg-zinc-600 border-transparent';
-            else if (pathSet.has(kk)) cls = 'bg-green-600 text-white border-green-700';
+            else if (pathSet.has(kk)) cls = 'bg-accent-600 text-white border-accent-700 dark:bg-accent dark:text-canvas dark:border-accent';
             else if (isCur) cls = 'bg-green-100 dark:bg-green-900/50 border-green-600';
             else if (n && n.s === 'open') cls = 'bg-amber-100 dark:bg-amber-900/40 border-amber-500';
-            else if (n && n.s === 'closed') cls = 'bg-sky-100 dark:bg-sky-900/40 border-sky-500';
+            else if (n && n.s === 'closed') cls = 'bg-slate-100 text-slate-500 dark:bg-panel dark:text-fg-done border-slate-300 dark:border-line';
             return (
-              <motion.div key={k} layout animate={{ scale: isCur ? 1.06 : 1 }} className={`relative flex aspect-square min-w-0 flex-col items-center justify-center rounded-md border text-slate-800 dark:text-zinc-100 ${cls}`}>
+              <motion.div key={k} layout animate={{ scale: isCur ? 1.06 : 1 }} className={`relative flex aspect-square min-w-0 flex-col items-center justify-center rounded-md border text-slate-800 dark:text-fg ${cls}`}>
                 {(isS || isG) && <span className={`absolute left-0.5 top-0 text-[10px] font-extrabold ${pathSet.has(kk) ? 'text-white' : isS ? 'text-green-700 dark:text-green-400' : 'text-rose-600 dark:text-rose-400'}`}>{isS ? 'S' : 'G'}</span>}
                 {n && !wallSet.has(kk) && (
                   <>
@@ -34,9 +34,9 @@ export default function GridViz({ frame }) {
           })}
         </div>
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-zinc-400">
-          {[['bg-amber-300', 'open (in the priority queue)'], ['bg-sky-300', 'closed (expanded)'], ['bg-green-200', 'current'], ['bg-green-600', 'final path'], ['bg-slate-700', 'wall']].map(([c, t]) => <span key={t}><i className={`mr-1.5 inline-block h-2.5 w-2.5 rounded-sm ${c}`} />{t}</span>)}
+          {[['bg-amber-300', 'open (in the priority queue)'], ['border border-slate-300 bg-slate-100 dark:border-line dark:bg-panel', 'closed (expanded)'], ['bg-green-200', 'current'], ['bg-green-600', 'final path'], ['bg-slate-700', 'wall']].map(([c, t]) => <span key={t}><i className={`mr-1.5 inline-block h-2.5 w-2.5 rounded-sm ${c}`} />{t}</span>)}
         </div>
-        <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400">Each cell: <b className="text-slate-800 dark:text-zinc-100">f</b> large, with g (cost so far) and h (estimate to goal) beneath. f = g + h.</p>
+        <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400">Each cell: <b className="text-slate-800 dark:text-fg">f</b> large, with g (cost so far) and h (estimate to goal) beneath. f = g + h.</p>
       </div>
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2 text-xs font-semibold">

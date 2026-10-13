@@ -23,7 +23,7 @@ export default function TableViz({ frame }) {
                   const isCur = cur && cur[0] === i && cur[1] === j, isDep = has(deps, i, j), isPath = has(path, i, j);
                   return (
                     <motion.td key={j} animate={{ scale: isCur ? 1.12 : 1 }} transition={{ duration: 0.2 }}
-                      className={`h-9 min-w-[36px] rounded-md font-mono font-semibold tabular-nums transition-colors ${isCur ? 'bg-amber-400 text-slate-900 ring-2 ring-amber-600' : isPath ? 'bg-green-600 text-white' : isDep ? 'bg-sky-200 text-slate-900 dark:bg-sky-500/40 dark:text-sky-100' : v === null ? 'border border-dashed border-slate-300 text-transparent dark:border-zinc-700' : 'bg-white text-slate-800 dark:bg-zinc-800 dark:text-zinc-100'}`}>
+                      className={`h-9 min-w-[36px] rounded-md font-mono font-semibold tabular-nums transition-colors ${isCur ? 'bg-accent-400 text-canvas ring-1 ring-accent-700 dark:ring-accent-200' : isPath ? 'bg-slate-700 text-white ring-1 ring-accent-600 dark:bg-line dark:text-accent dark:ring-accent' : isDep ? 'bg-slate-200 text-slate-900 dark:bg-zinc-700 dark:text-fg' : v === null ? 'border border-dashed border-slate-300 text-transparent dark:border-zinc-700' : 'bg-white text-slate-800 dark:bg-zinc-800 dark:text-fg'}`}>
                       {show(v)}
                     </motion.td>
                   );
@@ -34,7 +34,7 @@ export default function TableViz({ frame }) {
         </table>
       </div>
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-zinc-400">
-        {[['bg-amber-400', 'cell being computed'], ['bg-sky-300', 'cells it depends on'], ['bg-green-600', 'traceback path'], ['border border-dashed border-slate-400', 'not computed yet']].map(([c, t]) => <span key={t}><i className={`mr-1.5 inline-block h-2.5 w-2.5 rounded-sm ${c}`} />{t}</span>)}
+        {[['bg-accent-400', 'cell being computed'], ['bg-slate-200 dark:bg-zinc-700', 'cells it depends on'], ['bg-line ring-1 ring-accent', 'traceback path'], ['border border-dashed border-slate-400', 'not computed yet']].map(([c, t]) => <span key={t}><i className={`mr-1.5 inline-block h-2.5 w-2.5 rounded-sm ${c}`} />{t}</span>)}
       </div>
     </div>
   );

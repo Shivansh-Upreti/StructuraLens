@@ -16,15 +16,15 @@ export default function TimelineViz({ frame }) {
     <div>
       <p className="mb-3 text-xs font-semibold text-slate-500 dark:text-zinc-400">{sorted ? 'Sorted by finish time (the greedy key)' : 'Input order'}</p>
       <div className="relative rounded-md bg-slate-100/60 py-3 pl-[74px] pr-3 ring-1 ring-slate-200 dark:bg-zinc-950 dark:ring-zinc-800">
-        {last !== null && <motion.div aria-hidden="true" className="absolute bottom-7 top-3 w-0 border-l-2 border-dashed border-green-600 dark:border-green-400" initial={false} animate={{ left: `calc(74px + (100% - 74px - 12px) * ${last / tmax})` }} transition={{ type: 'spring', stiffness: 220, damping: 26 }}><span className="absolute -top-0.5 left-1 whitespace-nowrap rounded bg-green-600 px-1 text-[10px] font-bold text-white">last = {last}</span></motion.div>}
+        {last !== null && <motion.div aria-hidden="true" className="absolute bottom-7 top-3 w-0 border-l-2 border-dashed border-green-600 dark:border-green-400" initial={false} animate={{ left: `calc(74px + (100% - 74px - 12px) * ${last / tmax})` }} transition={{ duration: 0.18, ease: 'easeOut' }}><span className="absolute -top-0.5 left-1 whitespace-nowrap rounded bg-green-600 px-1 text-[10px] font-bold text-white">last = {last}</span></motion.div>}
         <div className="space-y-1">
           {acts.map((a) => (
-            <motion.div layout key={a.id} transition={{ type: 'spring', stiffness: 300, damping: 30 }} className="relative flex h-6 items-center">
+            <motion.div layout key={a.id} transition={{ duration: 0.18, ease: 'easeOut' }} className="relative flex h-6 items-center">
               <span className="absolute -left-[68px] w-16 text-right font-mono text-[11px] tabular-nums text-slate-600 dark:text-zinc-400">[{a.s}, {a.f})</span>
               <div className="relative h-full w-full">
                 <motion.div layout className={`absolute top-0 h-full rounded-md ${BAR[status[a.id]]} ${status[a.id] === 'rejected' ? 'opacity-55' : ''}`} style={{ left: `${(a.s / tmax) * 100}%`, width: `${((a.f - a.s) / tmax) * 100}%` }}
                   animate={{ scale: status[a.id] === 'considering' ? 1.04 : 1 }}>
-                  <span className="px-1.5 text-[10px] font-bold leading-6 text-white">{status[a.id] === 'chosen' ? '✔' : status[a.id] === 'rejected' ? '✘' : ''}</span>
+                  <span className="px-1.5 text-[10px] font-bold leading-6 text-white dark:text-canvas">{status[a.id] === 'chosen' ? '+' : status[a.id] === 'rejected' ? '×' : ''}</span>
                 </motion.div>
               </div>
             </motion.div>

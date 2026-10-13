@@ -24,7 +24,8 @@ function paramNames(fn) {
   return out.map((s) => s.split('=')[0].replace(/\.\.\./, '').trim());
 }
 
-export function runCustom(code, callExpr, limits) {
+/** opts.runtime(print) -> extra globals injected into the program (the LanguageAdapter's C/C++/Java/Python helpers). */
+export function runCustom(code, callExpr, limits, opts = {}) {
   const lines = String(code).split('\n');
   const names = [], defLine = {};
   lines.forEach((ln, i) => {
@@ -47,14 +48,17 @@ export function runCustom(code, callExpr, limits) {
       };
     };
     const transformed = String(code).replace(/^(\s*)(const|let)(\s+[A-Za-z_$][\w$]*\s*=)/gm, '$1var$3');
-    const wrapSrc = names.map((n) => `${n} = __wrap(${JSON.stringify(n)}, ${n});`).join('\n');
+    // typeof guard: a helper declared inside another function is not visible here and simply stays untraced.
+    const wrapSrc = names.map((n) => `if (typeof ${n} === 'function') ${n} = __wrap(${JSON.stringify(n)}, ${n});`).join('\n');
     const printFn = (...xs) => {
       const top = T.stack[T.stack.length - 1];
       if (top) T.at(top.id, defLine[top.name], 'print(…)', { out: xs.map((x) => fmt(snap(x), 60)).join(' ') });
     };
     // eslint-disable-next-line no-new-func
-    const fn = new Function('__wrap', 'print', 'console', '"use strict";\n' + transformed + '\n' + wrapSrc + '\nreturn (' + callExpr + ');');
-    return fn(wrap, printFn, { log: printFn });
+    const env = { __wrap: wrap, print: printFn, console: { log: printFn }, ...(opts.runtime ? opts.runtime(printFn) : {}) };
+    const keys = Object.keys(env);
+    const fn = new Function(...keys, '"use strict";\n' + transformed + '\n' + wrapSrc + '\nreturn (' + callExpr + ');');
+    return fn(...keys.map((k) => env[k]));
   }, limits);
   trace.names = names;
   return trace;

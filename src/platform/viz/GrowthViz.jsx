@@ -3,14 +3,15 @@ import { motion } from 'framer-motion';
 /* Growth curves / asymptotic bounds. Curves that leave the chart are cut where they cross the top edge. */
 const W = 420, H = 270, L = 44, R = 12, T = 12, B = 34;
 const TONE = {
-  green: ['stroke-green-600 dark:stroke-green-400', 'bg-green-600 dark:bg-green-400'],
-  teal: ['stroke-teal-600 dark:stroke-teal-400', 'bg-teal-600 dark:bg-teal-400'],
-  sky: ['stroke-sky-600 dark:stroke-sky-400', 'bg-sky-600 dark:bg-sky-400'],
-  amber: ['stroke-amber-500 dark:stroke-amber-400', 'bg-amber-500 dark:bg-amber-400'],
-  orange: ['stroke-orange-600 dark:stroke-orange-400', 'bg-orange-600 dark:bg-orange-400'],
-  rose: ['stroke-rose-600 dark:stroke-rose-400', 'bg-rose-600 dark:bg-rose-400'],
-  violet: ['stroke-violet-600 dark:stroke-violet-400', 'bg-violet-600 dark:bg-violet-400'],
+  green: ['stroke-accent-600 dark:stroke-accent', ''],
+  teal: ['stroke-accent-600 dark:stroke-accent', '7 3'],
+  sky: ['stroke-accent-600 dark:stroke-accent', '2 3'],
+  amber: ['stroke-slate-700 dark:stroke-zinc-200', ''],
+  orange: ['stroke-slate-700 dark:stroke-zinc-200', '7 3'],
+  rose: ['stroke-red-600 dark:stroke-red-500', ''],
+  violet: ['stroke-slate-500 dark:stroke-zinc-400', '2 3'],
 };
+const dashOf = (s) => (s.dash ? '5 4' : TONE[s.tone][1] || undefined);
 
 export default function GrowthViz({ frame }) {
   const { xmax, ymax, n, series, band, table } = frame;
@@ -41,9 +42,9 @@ export default function GrowthViz({ frame }) {
         {xTicks.map((t) => <text key={t} x={X(t)} y={H - 14} textAnchor="middle" className="fill-slate-500 text-[9px] dark:fill-zinc-400">{t}</text>)}
         <text x={(L + W - R) / 2} y={H - 3} textAnchor="middle" className="fill-slate-500 text-[9px] dark:fill-zinc-400">input size n</text>
         <text x={10} y={(T + H - B) / 2} textAnchor="middle" transform={`rotate(-90 10 ${(T + H - B) / 2})`} className="fill-slate-500 text-[9px] dark:fill-zinc-400">operations</text>
-        {bandPath && <motion.path d={bandPath} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fill-green-600/15 dark:fill-green-400/15" />}
+        {bandPath && <motion.path d={bandPath} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fill-accent-600/10 dark:fill-accent/10" />}
         {series.map((s) => (
-          <motion.path key={s.id} d={pathFor(s.ys)} fill="none" strokeWidth="2.4" strokeLinecap="round" strokeDasharray={s.dash ? '5 4' : undefined} className={TONE[s.tone][0]}
+          <motion.path key={s.id} d={pathFor(s.ys)} fill="none" strokeWidth="2.4" strokeLinecap="round" strokeDasharray={dashOf(s)} className={TONE[s.tone][0]}
             initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={{ duration: 0.7, ease: 'easeOut' }} />
         ))}
         {n !== null && (
@@ -54,7 +55,7 @@ export default function GrowthViz({ frame }) {
         )}
       </svg>
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-zinc-300">
-        {series.map((s) => <span key={s.id} className="inline-flex items-center gap-1.5"><i className={`inline-block h-2.5 w-2.5 rounded-full ${TONE[s.tone][1]}`} />{s.label}</span>)}
+        {series.map((s) => <span key={s.id} className="inline-flex items-center gap-1.5"><svg width="22" height="6" aria-hidden="true"><line x1="1" x2="21" y1="3" y2="3" strokeWidth="2" strokeDasharray={dashOf(s)} className={TONE[s.tone][0]} /></svg>{s.label}</span>)}
       </div>
       {table.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">

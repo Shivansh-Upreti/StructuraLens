@@ -8,8 +8,8 @@ function Cell({ ch, tone, label }) {
     match: 'border-green-600 bg-green-100 text-green-900 dark:bg-green-900/40 dark:text-green-200',
     bad: 'border-rose-500 bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-200',
     cur: 'border-amber-500 bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100',
-    none: 'border-slate-300 bg-white text-slate-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100',
-    found: 'border-green-500 bg-green-500 text-white',
+    none: 'border-slate-300 bg-white text-slate-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-fg',
+    found: 'border-accent bg-accent text-canvas',
   }[tone];
   return (
     <div className="flex flex-col items-center" style={{ width: CELL }}>
@@ -42,7 +42,7 @@ export default function StrMatchViz({ frame }) {
               })}
             </div>
             <p className="eyebrow mb-1 mt-3">Pattern (slides right; never the text pointer left)</p>
-            <motion.div className="flex" animate={{ x: offset * CELL }} transition={{ type: 'spring', stiffness: 260, damping: 28 }} style={{ width: pat.length * CELL }}>
+            <motion.div className="flex" animate={{ x: offset * CELL }} transition={{ duration: 0.18, ease: 'easeOut' }} style={{ width: pat.length * CELL }}>
               {pat.map((ch, k) => <Cell key={k} ch={ch} tone={found ? 'found' : k < j ? 'match' : k === j ? (bad ? 'bad' : 'cur') : 'none'} label={k} />)}
             </motion.div>
           </>

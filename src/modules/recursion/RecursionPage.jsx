@@ -15,7 +15,18 @@ import MobileTabs from '../../platform/components/MobileTabs.jsx';
 import CustomCodeWorkspace from '../../platform/components/CustomCodeWorkspace.jsx';
 import LogicFeedbackCard from '../../components/LogicFeedbackCard.jsx';
 import { validateRecursion } from '../../engine/logicValidator.js';
-import { RECURSION_EXAMPLES } from '../../engine/recursionExamples.js';
+import { RECURSION_EXAMPLES, LANG_EXAMPLES } from '../../engine/recursionExamples.js';
+import { LANGS, transpile } from '../../engine/languageAdapter.js';
+import { VizSkeleton } from '../../platform/components/Skeleton.jsx';
+
+const starterFor = (l) => (l === 'javascript' ? CUSTOM_DEFAULT : LANGS[l].boiler);
+
+/** The validator understands JavaScript; other languages are checked through their (line-preserving) translation.
+    Its one-line fixes are textual, so they apply to the original line; `===` becomes `==` outside JavaScript. */
+function findingsFor(src, lang, opts) {
+  if (lang === 'javascript') return validateRecursion(src, opts).findings;
+  return validateRecursion(transpile(lang, src).js, opts).findings.map((f) => (f.fix ? { ...f, fix: (x) => f.fix(x).replace(/!==/g, '!=').replace(/===/g, '==') } : f));
+}
 
 const defaults = (pr) => Object.fromEntries(pr.params.map((p) => [p.key, p.def]));
 
@@ -45,7 +56,9 @@ export default function RecursionPage() {
   const [vals, setVals] = useState(() => defaults(preset));
   const [draft, setDraft] = useState(CUSTOM_DEFAULT);
   // Custom code only (re)runs when the learner presses Run, so half-edited code never executes.
-  const [committed, setCommitted] = useState({ src: CUSTOM_DEFAULT, call: 'sumTo(4)', depth: 40 });
+  const [lang, setLang] = useState('javascript');          // Custom Code language (editor + translation)
+  const drafts = useRef({});                                 // per-language drafts, so switching never loses work
+  const [committed, setCommitted] = useState({ src: CUSTOM_DEFAULT, call: 'sumTo(4)', depth: 40, lang: 'javascript' });
   const [runNonce, setRunNonce] = useState(0);
   const [editing, setEditing] = useState(false);
   const [customTrace, setCustomTrace] = useState(null);
@@ -59,7 +72,7 @@ export default function RecursionPage() {
     if (!preset.custom) return undefined;
     let cancelled = false;
     setBusy(true);
-    runCustomSandboxed(committed.src, committed.call, { maxDepth: committed.depth }).then((tr) => { if (!cancelled) { setCustomTrace(tr); setBusy(false); } });
+    runCustomSandboxed(committed.src, committed.call, { maxDepth: committed.depth }, committed.lang).then((tr) => { if (!cancelled) { setCustomTrace(tr); setBusy(false); } });
     return () => { cancelled = true; };
   }, [preset, committed, runNonce]);
 
@@ -152,14 +165,15 @@ export default function RecursionPage() {
     setPresetId(id); setVals(defaults(pr)); setEditing(!!pr.custom); setCustomTrace(null);
   };
   const onParam = (key, text) => setVals((v) => ({ ...v, [key]: text }));
-  const onRun = () => { setCommitted({ src: draft, call: typed.call, depth: typed.depth }); setEditing(false); setRunNonce((n) => n + 1); };
+  const onRun = () => { setCommitted({ src: draft, call: typed.call, depth: typed.depth, lang }); setEditing(false); setRunNonce((n) => n + 1); };
+  const onLang = (l) => { drafts.current[lang] = draft; setLang(l); setDraft(drafts.current[l] ?? starterFor(l)); };
 
   /* ---- Suggestion & Correction Mode: validate the draft live while editing, the executed code (+ trace) after a run ---- */
   const findings = useMemo(() => {
     if (!preset.custom || !correction) return [];
-    return editing ? validateRecursion(draft).findings : validateRecursion(committed.src, { trace: customTrace }).findings;
-  }, [preset, correction, editing, draft, committed.src, customTrace]);
-  const rerunWith = (src) => { setDraft(src); setCommitted({ src, call: typed.call, depth: typed.depth }); setRunNonce((n) => n + 1); };
+    return editing ? findingsFor(draft, lang) : findingsFor(committed.src, committed.lang, { trace: customTrace });
+  }, [preset, correction, editing, draft, lang, committed.src, committed.lang, customTrace]);
+  const rerunWith = (src) => { setDraft(src); setCommitted({ src, call: typed.call, depth: typed.depth, lang: committed.lang }); setRunNonce((n) => n + 1); };
   const acceptFix = (f) => {
     const base = editing ? draft : committed.src;
     const lines = base.split('\n'); lines[f.line - 1] = f.fix(lines[f.line - 1]);
@@ -167,14 +181,18 @@ export default function RecursionPage() {
     if (editing) setDraft(next); else rerunWith(next);
   };
   const workspaceHost = {
-    examples: RECURSION_EXAMPLES, findings, running: busy, ran: true,
+    examples: lang === 'javascript' ? RECURSION_EXAMPLES : LANG_EXAMPLES[lang], findings, running: busy, ran: true,
+    lang, onLang, langs: Object.entries(LANGS).map(([id, l]) => [id, l.label]),
     onRun, onAccept: (next) => setDraft(next),
-    onExample: (ex) => { setDraft(ex.code); setVals((v) => ({ ...v, call: ex.call })); },
+    onExample: (ex) => { setDraft(ex.code); if (ex.call) setVals((v) => ({ ...v, call: ex.call })); },
     summary: customTrace && !editing ? null : (
       <p className="text-xs text-slate-500 dark:text-zinc-400">Write a recursive function, set the call expression (e.g. <code className="font-mono">sumTo(4)</code>) in the card above, then press Run. It is traced in an isolated worker with a depth limit and a time limit, so a missing base case ends in a safe, visible stack overflow.{correction && <> Suggestion mode is <b>on</b>: the validator checks the base case and whether each call moves toward it.</>}</p>
     ),
   };
-  const resetCustom = () => { setDraft(CUSTOM_DEFAULT); setVals((v) => ({ ...v, call: 'sumTo(4)' })); };
+  const resetCustom = () => { setDraft(starterFor(lang)); setVals((v) => ({ ...v, call: 'sumTo(4)' })); };
+  const entryNote = preset.custom && committed.lang !== 'javascript'
+    ? (customTrace && customTrace.fromMain ? `${customTrace.entry}  (${committed.lang === 'python' ? 'top-level call' : 'from main()'})` : (committed.lang === 'python' ? 'top-level call, read on Run' : 'read from main() on Run'))
+    : null;
 
   useEffect(() => {
     const onKey = (e) => {
@@ -198,14 +216,14 @@ export default function RecursionPage() {
     <div className="pb-24">
       <Hero />
       <main className="mx-auto max-w-[1500px] space-y-5 px-5 pb-32 pt-5">
-        <ControlCenter preset={preset} vals={vals} onPreset={onPreset} onParam={onParam} onRun={onRun} analysis={analysis} busy={busy} />
+        <ControlCenter preset={preset} vals={vals} onPreset={onPreset} onParam={onParam} onRun={onRun} analysis={analysis} busy={busy} entryNote={entryNote} />
         <MobileTabs value={mobileTab} onChange={setMobileTab} items={[['code', 'Code Editor'], ['viz', 'Visualization']]} layout="mobtab-rec" />
         <div id="workspace" className="grid items-start gap-5 xl:grid-cols-[minmax(400px,.85fr)_minmax(0,1.5fr)]">
           <div className={`flex min-w-0 flex-col gap-5 ${mobileTab === 'code' ? '' : 'max-lg:hidden'}`}>
             {preset.custom && editing ? (
               <section className="card flex min-h-0 flex-col" aria-label="Your code">
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Your code</h2>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-fg">Your code</h2>
                   <button type="button" className="btn !px-3 !py-1 text-xs" onClick={() => setEditing(false)}>Preview</button>
                 </div>
                 <div className="h-[560px]">
@@ -215,6 +233,7 @@ export default function RecursionPage() {
               </section>
             ) : (
               <CodePanel title={preset.custom ? 'Your code' : 'Code'} source={source} state={state} flash={flash} custom={!!preset.custom} editing={false}
+                lang={preset.custom ? committed.lang : 'javascript'} langLabel={preset.custom ? LANGS[committed.lang].label : null}
                 draft={draft} onDraft={setDraft} onToggleEdit={() => setEditing((e) => !e)} />
             )}
             {preset.custom && !editing && (
@@ -234,9 +253,16 @@ export default function RecursionPage() {
                 )}
               </section>
             )}
+            {preset.custom && !editing && customTrace && customTrace.js && (
+              <details className="card !p-3">
+                <summary className="cursor-pointer select-none font-mono text-xs text-slate-600 dark:text-fg-muted">&gt;_ translated JavaScript ({LANGS[committed.lang].label} &rarr; JS, same line numbers)</summary>
+                <pre className="mt-2 max-h-[260px] overflow-auto rounded-sm bg-slate-50 p-2 font-mono text-[12px] leading-[18px] text-slate-700 ring-1 ring-slate-200 dark:bg-canvas dark:text-fg-done dark:ring-line">{customTrace.js.split('\n').map((l, i) => `${String(i + 1).padStart(3)}  ${l}`).join('\n')}</pre>
+                <p className="mt-2 text-[11px] text-slate-500 dark:text-fg-muted">This is what the sandbox actually runs. The adapter handles a teaching subset (functions, arrays/vectors/lists, loops, recursion, printing, integer division); pointers, structs/classes and fixed-width overflow are not modelled.</p>
+              </details>
+            )}
             <WhyPanel desc={shownDesc} stepKey={idx} prediction={prediction} feedback={feedback} error={error} />
           </div>
-          <div className={`min-w-0 ${mobileTab === 'viz' ? '' : 'max-lg:hidden'}`}><Visualizer trace={trace} state={state} /></div>
+          <div className={`min-w-0 ${mobileTab === 'viz' ? '' : 'max-lg:hidden'}`}>{preset.custom && busy ? <VizSkeleton label="Tracing your code in the sandbox" /> : <Visualizer trace={trace} state={state} />}</div>
         </div>
         <div className={mobileTab === 'viz' ? '' : 'max-lg:hidden'}><InsightTabs preset={preset} trace={trace} state={state} analysis={analysis} idx={idx} onFlash={(line) => setFlash({ line, n: Date.now() })} /></div>
               </main>

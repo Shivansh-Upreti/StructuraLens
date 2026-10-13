@@ -20,7 +20,7 @@ function ThemeToggle() {
         return (
           <button key={id} type="button" role="radio" aria-checked={on} aria-label={`${text} theme`} title={`${text} theme`} onClick={() => setMode(id)}
             className={`relative flex h-7 w-7 items-center justify-center rounded-md transition-colors lg:h-8 lg:w-8 ${on ? 'text-green-700 dark:text-green-400' : 'text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100'}`}>
-            {on && <motion.span layoutId="theme-pill" className="absolute inset-0 rounded-md bg-white dark:bg-zinc-950" transition={{ type: 'spring', stiffness: 420, damping: 32 }} />}
+            {on && <motion.span layoutId="theme-pill" className="absolute inset-0 rounded-md bg-white dark:bg-zinc-950" transition={{ duration: 0.18, ease: 'easeOut' }} />}
             <span className="relative"><Icon /></span>
           </button>
         );
@@ -110,11 +110,11 @@ function MobileMenu({ route }) {
 
 export default function Navbar({ route }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-slate-50/85 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/85">
+    <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-slate-50 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mx-auto flex h-14 max-w-[1500px] items-center gap-2 px-3 lg:gap-3 lg:px-5">
         <a href={href('')} className="flex min-w-0 items-center gap-2 lg:gap-2.5" aria-label="StructuraLens home">
           <Logo size={34} className="h-[30px] w-[30px] flex-none lg:h-[34px] lg:w-[34px]" />
-          <span className=" text-lg font-semibold tracking-tight text-slate-900 dark:text-white lg:text-xl">Structura<span>Lens</span></span>
+          <span className=" text-lg font-semibold tracking-tight text-slate-900 dark:text-fg lg:text-xl">Structura<span>Lens</span></span>
         </a>
         <div className="ml-auto flex items-center gap-2 lg:gap-3">
           <div className="hidden lg:block"><TopicsMenu route={route} /></div>

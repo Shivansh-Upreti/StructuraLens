@@ -13,6 +13,7 @@ import VisualizerControls from './VisualizerControls.jsx';
 import ExplainPanel, { ModeToggle, useExplainMode } from './ExplainPanel.jsx';
 import CustomCodeWorkspace from './CustomCodeWorkspace.jsx';
 import MobileTabs from './MobileTabs.jsx';
+import { VizSkeleton } from './Skeleton.jsx';
 import Toasts from '../../components/Toasts.jsx';
 
 const KIND = {
@@ -50,7 +51,7 @@ function Seg({ value, onChange, items, layout, label, className = '' }) {
     <div className={`inline-flex flex-wrap rounded-md bg-slate-100 p-1 dark:bg-zinc-800 ${className}`} role="tablist" aria-label={label}>
       {items.map(([id, text]) => (
         <button key={id} role="tab" type="button" aria-selected={value === id} onClick={() => onChange(id)} className={`relative rounded-md px-3 py-1 text-sm font-semibold transition-colors max-lg:whitespace-nowrap ${value === id ? 'text-green-700 dark:text-green-300' : 'text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100'}`}>
-          {value === id && <motion.span layoutId={layout} className="absolute inset-0 rounded-md bg-white dark:bg-zinc-950" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
+          {value === id && <motion.span layoutId={layout} className="absolute inset-0 rounded-md bg-white dark:bg-zinc-950" transition={{ duration: 0.18, ease: 'easeOut' }} />}
           <span className="relative">{text}</span>
         </button>
       ))}
@@ -119,12 +120,12 @@ export default function AlgoPage({ moduleId }) {
         <div className="mx-auto flex max-w-[1700px] flex-wrap items-center gap-x-4 gap-y-2">
           <div className="min-w-0 max-lg:order-1">
             <p className="eyebrow flex items-center gap-2 !text-[10px] text-green-700 dark:text-green-300">{mod.branch}{mod.advanced && <span className="rounded-md bg-amber-100 px-1.5 py-px text-[9px] font-bold tracking-wider text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-mono">ADVANCED</span>}</p>
-            <h1 className=" text-2xl font-semibold leading-tight tracking-tight text-slate-900 dark:text-white">{mod.title}</h1>
+            <h1 className=" text-2xl font-semibold leading-tight tracking-tight text-slate-900 dark:text-fg">{mod.title}</h1>
           </div>
           {mod.algos.length > 1 && <Seg value={algo.id} onChange={setAlgoId} items={mod.algos.map((a) => [a.id, a.title])} layout={'algo-' + moduleId} label="Algorithm" className="max-lg:order-3 max-lg:w-full max-lg:flex-nowrap max-lg:overflow-x-auto" />}
           <div className="hidden flex-wrap items-center gap-1.5 xl:flex">
-            <Pill>⏱ {algo.complexity.time.length > 30 ? algo.complexity.time.split(/[ (,]/)[0] : algo.complexity.time}</Pill>
-            <Pill>▥ {algo.complexity.space.length > 24 ? algo.complexity.space.split(/[ (,]/)[0] : algo.complexity.space}</Pill>
+            <Pill>Time {algo.complexity.time.length > 30 ? algo.complexity.time.split(/[ (,]/)[0] : algo.complexity.time}</Pill>
+            <Pill>Space {algo.complexity.space.length > 24 ? algo.complexity.space.split(/[ (,]/)[0] : algo.complexity.space}</Pill>
             {placeholder && <Pill tone="amber">Preview</Pill>}
           </div>
           <div className="ml-auto flex items-center gap-2 max-lg:order-2"><span className="eyebrow hidden !text-[10px] sm:inline">Explain</span><ModeToggle mode={explainMode} onMode={setExplainMode} /></div>
@@ -144,7 +145,7 @@ export default function AlgoPage({ moduleId }) {
             {leftTab === 'trace' && (
               <>
                 <CodeTracer bare title={algo.title} code={algo.code} line={placeholder ? selLine : (frame ? frame.line : 0)} tone={placeholder ? 'active' : kind[3]} onLineClick={placeholder ? setSelLine : undefined} />
-                <section aria-live="polite" className={`mt-2 max-h-[34%] min-h-[72px] flex-none overflow-auto rounded-md border-l-4 bg-slate-100/70 p-3 dark:bg-zinc-950/60 ${placeholder ? 'border-green-600' : kind[2]}`}>
+                <section aria-live="polite" className={`mt-2 max-h-[34%] min-h-[72px] flex-none overflow-auto rounded-md border-l-4 bg-slate-100/70 p-3 dark:bg-zinc-950 ${placeholder ? 'border-green-600' : kind[2]}`}>
                   {placeholder ? (
                     <>
                       <p className="eyebrow text-green-700 dark:text-green-300">Line {selLine}</p>
@@ -153,7 +154,7 @@ export default function AlgoPage({ moduleId }) {
                   ) : (
                     <motion.div key={st.pos + algo.id} initial={{ opacity: 0.3, y: 3 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.14 }}>
                       <p className={`eyebrow ${kind[1]}`}>{kind[0]}</p>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-800 dark:text-zinc-100">{frame ? frame.note : 'Computing…'}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-800 dark:text-fg">{frame ? frame.note : 'Computing…'}</p>
                       {hint && <p className="mt-1.5 text-xs leading-relaxed text-slate-500 dark:text-zinc-400"><b className="font-semibold text-slate-600 dark:text-zinc-300">{explainMode === 'beginner' ? 'In plain words: ' : 'Analysis: '}</b>{hint}</p>}
                     </motion.div>
                   )}
@@ -170,17 +171,17 @@ export default function AlgoPage({ moduleId }) {
 
         <section className={`card flex min-w-0 flex-col !p-3 max-lg:h-[calc(100dvh-22rem)] max-lg:min-h-[340px] lg:min-h-0 ${mobileTab === 'viz' ? '' : 'max-lg:hidden'}`} aria-label="Visualization">
           <div className="mb-2 flex flex-none flex-wrap items-end justify-between gap-x-4 gap-y-2">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Visualizer</h2>
+            <h2 className="text-sm font-bold text-slate-900 dark:text-fg">Visualizer</h2>
             {schema.length > 0 && <div className="min-w-0 flex-1 basis-[280px]"><ParamFields schema={schema} values={raw} onChange={onParam} /></div>}
           </div>
-          <div className={`min-h-0 flex-1 overflow-auto ${loading ? 'opacity-60 transition-opacity' : 'transition-opacity'}`} style={{ '--viz-h': 'calc(100vh - 17rem)' }}>
+          <div className={`min-h-0 flex-1 overflow-auto ${loading && frame ? 'opacity-50 transition-opacity' : 'transition-opacity'}`} style={{ '--viz-h': 'calc(100vh - 17rem)' }}>
             {placeholder ? (
               <div className="rounded-lg border-2 border-dashed border-slate-300 p-6 text-center dark:border-zinc-700">
                 <p className="eyebrow text-amber-700 dark:text-amber-300">Planned visualization</p>
                 <p className="mx-auto mt-2 max-w-xl text-slate-700 dark:text-zinc-200">{algo.planned}</p>
                 <p className="mt-3 text-xs text-slate-500 dark:text-zinc-400">The pseudo-code, explanations and complexity are ready now. The animation plugs into the same step engine used by the other topics. Open <b>Explain</b> or click a line of code.</p>
               </div>
-            ) : (frame && Viz ? <Viz frame={frame} /> : <p className="py-16 text-center text-slate-400">Preparing animation…</p>)}
+            ) : (frame && Viz ? <Viz frame={frame} /> : <VizSkeleton label="Computing animation frames" className="!border-0 !p-0" />)}
           </div>
         </section>
       </div>

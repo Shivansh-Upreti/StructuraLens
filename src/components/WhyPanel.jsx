@@ -27,12 +27,12 @@ export default function WhyPanel({ desc, stepKey, prediction, feedback, error })
           <p className={`eyebrow ${TAG[kind]}`}>{prediction ? 'Predict' : desc.title}</p>
           {prediction ? (
             <>
-              <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-white">What will <code className="rounded-md bg-green-50 dark:bg-green-950/50 px-1.5 font-mono text-green-800 dark:text-green-300">{prediction.label}</code> return?</h3>
+              <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-fg">What will <code className="rounded-md bg-green-50 dark:bg-green-950/50 px-1.5 font-mono text-green-800 dark:text-green-300">{prediction.label}</code> return?</h3>
               <Predict onAnswer={prediction.onAnswer} onSkip={prediction.onSkip} />
             </>
           ) : <p className="mt-1.5 leading-relaxed text-slate-700 dark:text-zinc-200"><Parts parts={desc.parts} /></p>}
       </motion.div>
-      {feedback && <p className={`mt-3 rounded-md px-3 py-2 text-sm ${feedback.ok ? 'bg-green-50 dark:bg-green-950/50 text-green-900 dark:text-green-200' : 'bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200'}`}>{feedback.ok ? '✔ ' : '✘ '}{feedback.text}</p>}
+      {feedback && <p className={`mt-3 rounded-md px-3 py-2 text-sm ${feedback.ok ? 'bg-green-50 dark:bg-green-950/50 text-green-900 dark:text-green-200' : 'bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200'}`}>{feedback.ok ? 'Correct. ' : 'Not quite. '}{feedback.text}</p>}
       {error && <p className="mt-3 rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-900 dark:text-red-200">Your code threw: {error}</p>}
     </section>
   );

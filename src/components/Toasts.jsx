@@ -9,10 +9,10 @@ const TONES = {
 function Toast({ t, onClose }) {
   useEffect(() => { const id = setTimeout(() => onClose(t.id), 9000); return () => clearTimeout(id); }, [t.id, onClose]);
   return (
-    <motion.div layout initial={{ opacity: 0, x: 40, scale: 0.96 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 40 }} transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+    <motion.div layout initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ duration: 0.18, ease: 'easeOut' }}
       className={`pointer-events-auto w-[340px] max-w-[calc(100vw-2rem)] rounded-lg border p-3.5 ${TONES[t.tone] || TONES.warn}`}>
       <div className="flex items-start gap-2">
-        <span aria-hidden="true" className="mt-0.5">{t.tone === 'error' ? '⛔' : '⚠️'}</span>
+        <span aria-hidden="true" className="mt-px flex-none font-mono text-[10px] font-bold tracking-wider">{t.tone === 'error' ? 'ERR' : 'WARN'}</span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">{t.title}</p>
           <p className="mt-0.5 break-words text-[13px] leading-snug opacity-90">{t.msg}</p>

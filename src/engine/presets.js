@@ -403,7 +403,7 @@ function isOdd(n) {
     params: [{ key: 'n', label: 'n', type: 'int', def: 3, min: -5, max: 9 }],
     code: `function countdown(n) {
   print(n);
-  // ⚠ BUG: nothing ever stops this call chain
+  // BUG: nothing ever stops this call chain
   return countdown(n - 1);
 }`,
     run(T, { n }) {
@@ -436,7 +436,7 @@ function isOdd(n) {
 }`;
 
   const CUSTOM = {
-    id: 'custom', group: 'Your own code', title: '✎ Custom JavaScript',
+    id: 'custom', group: 'Your own code', title: 'Custom Code',
     flavor: 'User code', custom: true,
     params: [{ key: 'call', label: 'call', type: 'text', def: 'sumTo(4)' }, { key: 'depth', label: 'depth limit', type: 'int', def: 40, min: 5, max: 200 }],
     code: CUSTOM_DEFAULT,

@@ -25,15 +25,15 @@ function Story({ preset, trace, idx }) {
   const m = preset.metaphor, parts = liveStory(trace, idx, preset);
   return (
     <div>
-      <div className="flex items-center gap-3"><span className="text-4xl" aria-hidden="true">{m.emoji}</span><h3 className="text-lg font-bold text-slate-900 dark:text-white">{m.title}</h3></div>
+      <div className="flex items-center gap-3"><h3 className="text-lg font-bold text-slate-900 dark:text-fg">{m.title}</h3></div>
       <p className="mt-2 text-slate-600 dark:text-zinc-300">{m.text}</p>
       <div className="my-4 rounded-lg bg-green-50 dark:bg-green-950/50 p-4 ring-1 ring-green-100 dark:ring-green-900">
         <p className="eyebrow text-green-700 dark:text-green-400">In the story, right now</p>
-        <p className="mt-1 text-slate-800 dark:text-zinc-100">{parts ? <Parts parts={parts} /> : <span className="text-slate-400 dark:text-zinc-500">Step forward to see the story.</span>}</p>
+        <p className="mt-1 text-slate-800 dark:text-fg">{parts ? <Parts parts={parts} /> : <span className="text-slate-400 dark:text-zinc-500">Step forward to see the story.</span>}</p>
       </div>
       <table className="w-full text-left text-sm">
         <thead><tr className="eyebrow"><th className="py-1.5 pr-3">In the metaphor</th><th className="py-1.5">In memory</th></tr></thead>
-        <tbody>{m.map.map((r) => <tr key={r[0]} className="border-t border-slate-100 dark:border-zinc-800"><td className="py-2 pr-3">{r[0]}</td><td className="py-2 font-medium text-slate-900 dark:text-white">{r[1]}</td></tr>)}</tbody>
+        <tbody>{m.map.map((r) => <tr key={r[0]} className="border-t border-slate-100 dark:border-zinc-800"><td className="py-2 pr-3">{r[0]}</td><td className="py-2 font-medium text-slate-900 dark:text-fg">{r[1]}</td></tr>)}</tbody>
       </table>
       <p className="mt-3 text-xs text-slate-500 dark:text-zinc-400">Where the metaphor breaks: a real stack frame also stores arguments, locals and a return address; people don&apos;t. The Call stack view is the literal truth.</p>
     </div>
@@ -48,9 +48,9 @@ function Analysis({ preset, analysis: a, onFlash }) {
     <div className="space-y-5 text-sm">
       <div>
         <h3 className="eyebrow mb-2">Classification <span className="ml-1 rounded bg-slate-100 dark:bg-zinc-800 px-1.5 py-px normal-case tracking-normal">heuristic</span></h3>
-        <ul className="space-y-1.5 text-slate-600 dark:text-zinc-300">{a.badges.map((b) => <li key={b.label}><b className="text-slate-900 dark:text-white">{b.label}:</b> {b.hint}</li>)}</ul>
+        <ul className="space-y-1.5 text-slate-600 dark:text-zinc-300">{a.badges.map((b) => <li key={b.label}><b className="text-slate-900 dark:text-fg">{b.label}:</b> {b.hint}</li>)}</ul>
       </div>
-      {a.warnings.length > 0 && <div className="space-y-2">{a.warnings.map((w) => <p key={w} className="rounded-md bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-amber-900 dark:text-amber-200 ring-1 ring-amber-200 dark:ring-amber-800">⚠ {w}</p>)}</div>}
+      {a.warnings.length > 0 && <div className="space-y-2">{a.warnings.map((w) => <p key={w} className="rounded-md bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-amber-900 dark:text-amber-200 ring-1 ring-amber-200 dark:ring-amber-800">{w}</p>)}</div>}
       <div>
         <h3 className="eyebrow mb-2">Measured on this input</h3>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -65,7 +65,7 @@ function Analysis({ preset, analysis: a, onFlash }) {
       </div>
       {a.complexity && <div><h3 className="eyebrow mb-1">Complexity {!a.complexity.curated && <span className="ml-1 rounded bg-slate-100 dark:bg-zinc-800 px-1.5 py-px normal-case tracking-normal">heuristic</span>}</h3><p><b>Time:</b> {a.complexity.time}</p><p><b>Space:</b> {a.complexity.space}</p></div>}
       {cur && <div><p><b>Alternatives:</b> {cur.alt}</p><h3 className="eyebrow mb-1 mt-4">Failure modes</h3><ul className="list-disc space-y-1 pl-5 text-slate-600 dark:text-zinc-300">{cur.pitfalls.map((x) => <li key={x}>{x}</li>)}</ul></div>}
-      <div className="rounded-lg bg-green-50 dark:bg-green-950/50 p-4 ring-1 ring-green-100 dark:ring-green-900"><h3 className="eyebrow mb-1 text-green-700 dark:text-green-400">Think first</h3><ul className="list-disc space-y-1 pl-5 text-slate-800 dark:text-zinc-100">{preset.think.map((x) => <li key={x}>{x}</li>)}</ul></div>
+      <div className="rounded-lg bg-green-50 dark:bg-green-950/50 p-4 ring-1 ring-green-100 dark:ring-green-900"><h3 className="eyebrow mb-1 text-green-700 dark:text-green-400">Think first</h3><ul className="list-disc space-y-1 pl-5 text-slate-800 dark:text-fg">{preset.think.map((x) => <li key={x}>{x}</li>)}</ul></div>
       <p className="text-xs text-slate-500 dark:text-zinc-400">Measurements describe this input only. Curated complexity claims are standard results; custom-code claims are heuristics. Verify before relying on them.</p>
     </div>
   );

@@ -37,10 +37,10 @@ Because heavy dependency and build folders (`node_modules/` and `dist/`) are int
 
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/Shivansh-Upreti/RECURSIO.git](https://github.com/Shivansh-Upreti/RECURSIO.git)
+git clone [https://github.com/Shivansh-Upreti/StructuraLens.git](https://github.com/Shivansh-Upreti/StructuraLens.git)
 
 # 2. Navigate into the project directory
-cd RECURSIO
+cd StructuraLens
 
 # 3. Install dependencies (This automatically generates your local 'node_modules/' folder)
 npm install
